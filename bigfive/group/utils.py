@@ -48,8 +48,7 @@ def search_group_task(group_name, remark, create_time, page, size, order_name, o
     else:
         return {}
     # 基础查询语句
-    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}},
-             "from": (int(page) - 1) * int(size), "size": size, "sort": [{"create_time":{"order":"desc"}}]}
+    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}},"from": (int(page) - 1) * int(size), "size": size, "sort": [{"create_time":{"order":"desc"}}]}
     if order and order_name:
         query['sort'].append({order_name: {"order": order}})
     # 添加组名查询
