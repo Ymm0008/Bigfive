@@ -402,9 +402,25 @@ def get_in_group_ranking(event_id,mtype):
 def get_network(event_id):
     result = {'important_users_list': []}
     important_users_list = es.get(index='event_information', doc_type='text', id=event_id)['_source']['userlist_important']
-    for uid in important_users_list[:5]:
-        user_item = es.get(index='user_information', doc_type='text', id=uid)['_source']
-        result['important_users_list'].append(user_item)
+    query_body = {
+        "query": {
+            "filtered": {
+                "filter": {
+                    "bool": {
+                        "must": [
+                            {
+                                "terms": {
+                                    "uid": important_users_list
+                                }
+                            }
+                        ]}
+                }}
+        },
+        "size": 5,
+    }
+
+    user_item = es.search(index='user_information', doc_type='text', body=query_body)['hits']['hits']
+    result['important_users_list'].append(user_item)
 
     message_type = 3
     key = 'target'
