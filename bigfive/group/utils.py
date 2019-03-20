@@ -49,7 +49,7 @@ def search_group_task(group_name, remark, create_time, page, size, order_name, o
         return {}
     # 基础查询语句
     query = {"query": {"bool": {"must": [], "must_not": [], "should": []}},
-             "from": (int(page) - 1) * int(size), "size": size, "sort": []}
+             "from": (int(page) - 1) * int(size), "size": size, "sort": [{"create_time":{"order":"desc"}}]}
     if order and order_name:
         query['sort'].append({order_name: {"order": order}})
     # 添加组名查询
@@ -94,7 +94,7 @@ def delete_by_id(index, doc_type, id):
     if index == 'task':
         r = es.get(index='group_task', doc_type=doc_type, id=id)
         if r['_source']['progress'] not in  [0,3]:
-            raise ValueError('progress is not 0')
+            raise ValueError('progress is not 0 or 3')
         es.delete(index='group_task', doc_type=doc_type, id=id)
     elif index == 'info':
         es.delete(index='group_ranking', doc_type=doc_type, id=id)
