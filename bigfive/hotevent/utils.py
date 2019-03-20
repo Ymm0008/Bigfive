@@ -420,7 +420,7 @@ def get_network(event_id):
     }
 
     user_item = es.search(index='user_information', doc_type='text', body=query_body)['hits']['hits']
-    result['important_users_list'].append(user_item)
+    result['important_users_list'] += [user['_source'] for user in user_item]
 
     message_type = 3
     key = 'target'
