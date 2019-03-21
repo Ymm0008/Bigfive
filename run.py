@@ -11,11 +11,9 @@ optparser.add_option('-p','--port',dest='port',help='Server Http Port Number', d
 app = create_app()
 
 
-# @app.route('/')
-# def redirect_2_login():
-#     if not session:
-#         return redirect('manage/login')
-#     return redirect('index/homepage')
+@app.route('/')
+def redirect_2_login():
+    return redirect('pages/homepage.html')
 
 
 if __name__ == '__main__':
