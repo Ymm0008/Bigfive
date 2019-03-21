@@ -22,7 +22,7 @@ def get_hot_event_list(keyword, page, size, order_name, order_type):
     query['size'] = str(size)
     if keyword:
         query['query']['bool']['should'] += [{"wildcard":{"event_name": "*{}*".format(keyword)}},{"match":{"keywords": "{}".format(keyword)}}]
-    print(query)
+    # print(query)
     hits = es.search(index='event_information', doc_type='text', body=query)['hits']
 
     result = {'rows': [], 'total': hits['total']}
@@ -332,7 +332,7 @@ def get_in_group_renge(event_id):
     # 拼接聚合语句 条数
     for i in personality_label_list:
         query["aggs"].update({i.split("_")[0]: {'terms': {'field': i}}})
-    print(query)
+    # print(query)
     aggregations = es.search(index="user_ranking", doc_type="text", body=query)[
         "aggregations"]
     map_dic = {0: 'low', 2: 'high'}
@@ -488,7 +488,7 @@ def get_emotion_trend(event_id):
         }
         for i in emotion_result:
             for k, v in i['_source'].items():
-                print(k, v)
+                # print(k, v)
                 if k in result:
                     result[k].append(v)
                 if k == 'date':
@@ -502,7 +502,7 @@ def get_semantic(event_id):
     result = {'keywords': {}}
     keywords_list = es.get(index='event_wordcloud', id=event_id, doc_type='text')['_source']['keywords']
     keywords_item = {}
-    print(len(keywords_list))
+    # print(len(keywords_list))
     for keyword in keywords_list:
         keywords_item[keyword['keyword']] = keyword['count']
     keywords_item_sorted = sorted(keywords_item.items(), key=lambda x:x[1], reverse=True)[0:200]
@@ -518,7 +518,7 @@ def get_semantic(event_id):
     river_dict = {
         'time': []
     }
-    print(river_dict['time'])
+    # print(river_dict['time'])
     for k1, v1 in cluster_count_sorted.items():
         river_dict['time'].append(k1)
         # print(k1, v1)
