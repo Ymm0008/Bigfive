@@ -21,7 +21,7 @@ def get_hot_politics_list(keyword, page, size, order_name, order_type):
     query['size'] = str(size)
     if keyword:
         query['query']['bool']['should'] += [{"wildcard":{"politics_name": "*{}*".format(keyword)}},{"match":{"keywords": "{}".format(keyword)}}]
-    print(query)
+    # print(query)
     hits = es.search(index='politics_information', doc_type='text', body=query)['hits']
 
     result = {'rows': [], 'total': hits['total']}
