@@ -77,7 +77,7 @@ def word_analysis_daily(date,uid_list):
                   sensitive_dict[uid] = {sensitive_word:1 for sensitive_word in sensitive_words_dict}
 
 
-          print(hastag_dict)
+          # print(hastag_dict)
           #遍历存入数据库
           for uid in keywords_dict:
               # print(keywords_dict[uid],hastag_dict[uid],sensitive_dict[uid])
@@ -85,12 +85,12 @@ def word_analysis_daily(date,uid_list):
               hastags = [{'hastag':k,'count':hastag_dict[uid][k]} for k in hastag_dict[uid]]
               sensitive_words = [{'sensitive_word':k,'count':sensitive_dict[uid][k]} for k in sensitive_dict[uid]]
 
-              print("key_words:")
-              print(keyword)
-              print("hastags:")
-              print(hastags)
-              print("sensitive_words")
-              print(sensitive_words)
+              # print("key_words:")
+              # print(keyword)
+              # print("hastags:")
+              # print(hastags)
+              # print("sensitive_words")
+              # print(sensitive_words)
 
               dic = {
                   'keywords':keywords,
