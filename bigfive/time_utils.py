@@ -60,7 +60,7 @@ def get_datelist_v2(start_date, end_date):
 def get_before_date(date_cha,date=None):
     # date_cha为当天日期的前几天,返回前几天的日期
     # 如当天2018-7-7,date_cha=1,则返回2018-7-6
-    # 如当天2018-7-7,date_cha=-1,则返回2018-7-6
+    # 如当天2018-7-7,date_cha=-1,则返回2018-7-8
     if not date:
         today = datetime.date.today()
     else:

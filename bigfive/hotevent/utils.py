@@ -332,6 +332,7 @@ def get_in_group_renge(event_id):
     # 拼接聚合语句 条数
     for i in personality_label_list:
         query["aggs"].update({i.split("_")[0]: {'terms': {'field': i}}})
+    print(query)
     aggregations = es.search(index="user_ranking", doc_type="text", body=query)[
         "aggregations"]
     map_dic = {0: 'low', 2: 'high'}
@@ -368,7 +369,7 @@ def get_in_group_ranking(event_id,mtype):
     }
     # 通过标签限制字段 不然全查出来 查询微博时比较耗时
     r = es.search(index='event_personality',doc_type='text',body=query,_source_include=['{mtype}_high,{mtype}_low'.format(mtype=mtype)])['hits']['hits']
-    print(r,'*****************')
+    # print(r,'*****************')
     if not r:
         return {}
     r = r[0]['_source']
