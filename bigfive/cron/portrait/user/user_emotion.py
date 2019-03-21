@@ -33,11 +33,11 @@ def cal_user_emotion(uid,weibo_data_dict):
             for j in range(0,7):
                 if j not in sentiment_dict:
                     sentiment_dict[j] = 0
-            es.index(index = "user_emotion",doc_type = "text",id = uid+ "_"+str(es_timestamp), body = {"timestamp":es_timestamp,"uid": uid, "nuetral":  sentiment_dict[0], "positive": sentiment_dict[1], "negtive":sum_r-sentiment_dict[0]-sentiment_dict[1],"date":day})
+            es.index(index = "user_emotion",doc_type = "text",id = str(uid)+ "_"+str(es_timestamp), body = {"timestamp":es_timestamp,"uid": uid, "nuetral":  sentiment_dict[0], "positive": sentiment_dict[1], "negtive":sum_r-sentiment_dict[0]-sentiment_dict[1],"date":day})
             #print(uid,es_timestamp,sentiment_dict,sentiment_dict[0],sum_r,day)
             #print("================")
         else:
-            es.index(index = "user_emotion",doc_type = "text",id = uid+ "_"+str(es_timestamp), body = {"timestamp":es_timestamp,"uid": uid, "nuetral":  0, "positive": 0, "negtive":0,"date":day})
+            es.index(index = "user_emotion",doc_type = "text",id = str(uid)+ "_"+str(es_timestamp), body = {"timestamp":es_timestamp,"uid": uid, "nuetral":  0, "positive": 0, "negtive":0,"date":day})
             #print("no data")
         
 
