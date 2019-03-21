@@ -160,7 +160,7 @@ def topic_classfiy(uid_list,uid_weibo):#话题分类主函数
 ####################################
 
 def stopwordslist():
-    stopwords = [line.strip() for line in open('stop_words.txt').readlines()]
+    stopwords = [line.strip() for line in open(os.path.join(ABS_PATH, 'stop_words.txt')).readlines()]
     return stopwords
 
 

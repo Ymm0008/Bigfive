@@ -322,7 +322,7 @@ def get_recommend_result(v_type,label):#根据三种分类结果选出一个标�
 
 def stopwordslist():
 
-    stopwords = [line.strip() for line in open('stop_words.txt').readlines()]
+    stopwords = [line.strip() for line in open(os.path.join(ABS_PATH, 'stop_words.txt')).readlines()]
     return stopwords
 
 def segment(doc):
