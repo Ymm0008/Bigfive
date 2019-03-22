@@ -152,10 +152,10 @@ def get_geo(event_id,geo,s, e):
         else:
             geo_dic[city] += 1
     # 通过省条数排名
-
+    if geo == '中国':
+        geo_dic.update({'国外': abroad_count})
     result= {'city':geo_dic,'rank':[]}
     result['rank'] = [{i[0]:i[1]} for i in sorted(geo_dic.items(), key=lambda x: x[1], reverse=True)[:14]]
-    result['rank'].append({'海外': abroad_count})
     return result
 
 
