@@ -32,10 +32,10 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     size = size if size else '10'
     sort_list = []
     if order_dict:
-        for order_name, order_type in json.loads(order_dict).items():
-            sort_list.append({order_name: {"order": "desc"}}) if order_type else sort_list.append({order_name: {"order": "asc"}})
-    # if order_name == 'name':
-    #     order_name = 'username'
+        for o_n, o_t in json.loads(order_dict).items():
+            sort_list.append({o_n: {"order": "desc"}}) if o_t else sort_list.append({o_n: {"order": "asc"}})
+    if order_name == 'name':
+        order_name = 'username'
     order_name = order_name if order_name else 'username'
     order_type = order_type if order_type else 'asc'
     sort_list.append({order_name: {"order": order_type}})
@@ -94,6 +94,7 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     # query['sort'] = [{i: {'order': order_type}} for i in order_name.split(',')]
     # query['sort'] = [{order_name: {"order": order_type}}]
 
+    print(query)
     hits = es.search(index='user_ranking', doc_type='text', body=query)['hits']
 
     result = {'rows': [], 'total': hits['total']}
