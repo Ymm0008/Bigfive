@@ -36,8 +36,8 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
             sort_list.append({o_n: {"order": "desc"}}) if o_t else sort_list.append({o_n: {"order": "asc"}})
     if order_name == 'name':
         order_name = 'username'
-    order_name = order_name if order_name else 'username'
-    order_type = order_type if order_type else 'asc'
+    order_name = order_name if order_name else 'influence_index'
+    order_type = order_type if order_type else 'desc'
     sort_list.append({order_name: {"order": order_type}})
 
     machiavellianism_index = machiavellianism_index if machiavellianism_index else 0

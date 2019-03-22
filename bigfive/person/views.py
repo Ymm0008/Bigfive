@@ -35,8 +35,8 @@ def return_portrait_table():
     openn_index = parameters.get('openn_index', 0)
     agreeableness_index = parameters.get('agreeableness_index', 0)
     conscientiousness_index = parameters.get('conscientiousness_index', 0)
-    order_name = parameters.get('order_name', 'username')
-    order_type = parameters.get('order_type', 'asc')
+    order_name = parameters.get('order_name', 'influence_index')
+    order_type = parameters.get('order_type', 'desc')
 
     result = portrait_table(keyword, page, size, order_name, order_type, machiavellianism_index, narcissism_index, psychopathy_index, extroversion_index, nervousness_index, openn_index, agreeableness_index, conscientiousness_index, order_dict)
 

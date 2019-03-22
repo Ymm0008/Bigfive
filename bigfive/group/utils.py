@@ -111,8 +111,8 @@ def search_group_ranking(keyword, page, size, order_name, order_type, order_dict
 
     if order_name == 'name':
         order_name = 'group_name'
-    order_name = order_name if order_name else 'group_name'
-    order_type = order_type if order_type else 'asc'
+    order_name = order_name if order_name else 'influence_index'
+    order_type = order_type if order_type else 'desc'
     sort_list.append({order_name: {"order": order_type}})
 
     # 数据库中有些数据没有label字段，过滤掉这些数据
