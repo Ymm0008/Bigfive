@@ -58,16 +58,25 @@ def user_portrait(uid, start_date,end_date):
     print('Calculating word analysis...')
     get_word_analysis(uid,start_date,end_date)
 
-    print('Calculating word analysis...')
+    print('Calculating user emotion...')
+    emo_time_s = time.time()
     cal_user_emotion(uid,weibo_data_dict)
+    emo_time_e = time.time()
+    print('Calculating user emotion time:',emo_time_e-emo_time_s)
 
     
 
-    print('Calculating word analysis...')
+    print('Calculating user social...')
+    s_s_time = time.time()
     cal_user_social(uid,weibo_data_dict)
+    s_e_time = time.time()
+    print('Calculating user social time:',s_e_time-s_s_time)
 
-    print('Calculating word analysis...')
+    print('Calculating user influence...')
+    i_s_time = time.time()
     cal_user_influence(uid,weibo_data_dict)
+    i_e_time = time.time()
+    print('Calculating user influence time:',i_e_time-i_s_time)
     
 if __name__ == '__main__':
     user_portrait(2061250093,"2016-11-13","2016-11-27")

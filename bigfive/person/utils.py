@@ -167,7 +167,7 @@ def get_index_rank(personality_value, personality_name, label_type):
     if index_rank['_shards']['successful'] != 0:
        result = index_rank['count']
     else:
-        print('es index rank error')
+        # print('es index rank error')
         result = 0
     all_user_count = es.count(index=USER_RANKING, doc_type='text', body={'query':{'match_all':{}}})['count']
     if label_type == 'low':
@@ -374,7 +374,7 @@ def get_user_activity(uid):
         except:
             item = {'rank': i + 1, 'count': '-', 'ip': '-', 'geo': '-'}
         one_day_ip_rank.append(item)
-    print(one_day_ip_rank)
+    # print(one_day_ip_rank)
 
     one_day_geo_rank = []
     one_day_geo_sorted = sorted(one_day_geo_item.items(), key=lambda x: x[1], reverse=True)
@@ -422,7 +422,7 @@ def get_user_activity(uid):
             }
         }
     }
-    print('one_week_query', one_week_query)
+    # print('one_week_query', one_week_query)
     one_week_ip_rank = []
     one_week_result = \
     es.search(index='user_activity', doc_type='text', body=one_week_query)['aggregations']['ip_count']['buckets']
@@ -438,7 +438,7 @@ def get_user_activity(uid):
         except:
             item = {'rank': i + 1, 'count': '-', 'ip': '-', 'geo': '-'}
         one_week_ip_rank.append(item)
-    print(one_week_ip_rank)
+    # print(one_week_ip_rank)
     # 活跃度分析
     geo_query = {
         "query": {
@@ -509,7 +509,7 @@ def get_user_activity(uid):
                 continue
             item = {'s': max(geo_dict_item[i][1], key=geo_dict_item[i][1].get).split('&')[1], 'e': ''}
             route_list.append(item)
-            print('maxmaxmax', max(geo_dict_item[i][1], key=geo_dict_item[i][1].get))
+            # print('maxmaxmax', max(geo_dict_item[i][1], key=geo_dict_item[i][1].get))
             if i > 0:
                 route_list[i - 1]['e'] = max(geo_dict_item[i][1], key=geo_dict_item[i][1].get).split('&')[1]
 
@@ -517,7 +517,7 @@ def get_user_activity(uid):
             del (route_list[-1])
         elif len(route_list) == 1:
             route_list[0]['e'] = route_list[0]['s']
-        print(route_list)
+        # print(route_list)
     else:
         for i in range(5):
             one_week_geo_rank.append({'rank': i + 1, 'count': '-', 'geo': '-'})
@@ -582,14 +582,14 @@ def get_preference_identity(uid):
 
     result['sensitive_words'] = {}
     if analysis_result['sensitive_words']:
-        print(analysis_result['sensitive_words'])
+        # print(analysis_result['sensitive_words'])
         for i in analysis_result['sensitive_words']:
             result['sensitive_words'].update({i['sensitive_word']: i['count']})
 
     query['query']['bool']['must'].append({"term": {"has_new_information": "1"}})
     query['query']['bool']['must_not'].append({"constant_score": {"filter": {"missing": {"field": "topic_computer"}}}})
     query['query']['bool']['must_not'].append({"constant_score": {"filter": {"missing": {"field": "main_domain"}}}})
-    print(query)
+    # print(query)
     preference_and_topic_data = es.search(index='user_domain_topic', doc_type='text', body=query)['hits']['hits']
     # preference_and_topic_data = es.search(index='user_domain_topic', doc_type='text', body=query)['hits']['hits'][0]['_source']
     if not preference_and_topic_data:

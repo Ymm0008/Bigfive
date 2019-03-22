@@ -80,6 +80,16 @@ PERSONALITY_DIC = {
     'agreeableness_index':{'name':'开放性','threshold':USER_AGREEABLENESS_THRESHOLD},
     'conscientiousness_index':{'name':'尽责性','threshold':USER_CONSCIENTIOUSNESS_THRESHOLD}
 }
+PERSONALITY_EN_CH = {
+    'machiavellianism':'马基雅维里主义',
+    'narcissism':'自恋',
+    'psychopathy':'精神病态',
+    'extroversion':'外倾性',
+    'nervousness':'神经质',
+    'openn':'开放性',
+    'agreeableness':'开放性',
+    'conscientiousness':'尽责性'
+}
 PERSONALITY_LABEL_LIST=["machiavellianism_label","narcissism_label","psychopathy_label","extroversion_label",\
                         "nervousness_label","openn_label", "agreeableness_label", "conscientiousness_label"]
 

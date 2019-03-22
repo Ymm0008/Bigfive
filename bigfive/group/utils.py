@@ -279,7 +279,7 @@ def get_index_rank(personality_value, personality_name, label_type):
     if index_rank['_shards']['successful'] != 0:
        result = index_rank['count']
     else:
-        print('es index rank error')
+        # print('es index rank error')
         result = 0
     all_user_count = es.count(index=USER_RANKING, doc_type='text', body={'query':{'match_all':{}}})['count']
     if label_type == 'low':
@@ -305,12 +305,12 @@ def get_group_basic_info(gid):
         }
     }
     group_item = {}
-    print(query)
+    # print(query)
     result = es.search(index='group_information', doc_type='text', body=query)[
         'hits']['hits'][0]['_source']
     group_ranking_result = es.search(index='group_ranking', doc_type='text', body=query)[
         'hits']['hits'][0]['_source']
-    print(group_ranking_result)
+    # print(group_ranking_result)
 
     # 黑暗人格字段
     group_item['machiavellianism'] = group_ranking_result['machiavellianism_index']
@@ -633,7 +633,7 @@ def get_group_activity(group_id):
     query = {"query": {"bool": {"must": [{"term": {"group_id": group_id}}], "must_not": [
     ], "should": []}}, "from": 0, "size": 1, "sort": [], "aggs": {}}
 
-    print(query)
+    # print(query)
     hits = es.search(index='group_activity', doc_type='text',
                      body=query)['hits']['hits']
     if not hits:

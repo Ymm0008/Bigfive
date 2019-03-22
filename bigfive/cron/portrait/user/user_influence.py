@@ -12,7 +12,7 @@ from config import *
 from time_utils import *
 from global_utils import *
 
-
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 Fifteenminutes = 15
 
 
@@ -488,7 +488,7 @@ def createWordTree():
 
     awords = []
 
-    for b in open('sensitive_words.txt', 'r'):
+    for b in open(os.path.join(ABS_PATH, 'sensitive_words.txt'), 'r'):
         awords.append(b.strip().split('\t')[0])
         #所有敏感词列表
     #print(awords)
@@ -571,7 +571,7 @@ def cal_sensitive(today_sensitive_words_dict):
 
     sensitive_score_dict = { "1": 1,"2": 5,"3": 10}
     sensitive_words_weight = dict()
-    for b in open('sensitive_words.txt', 'r'):
+    for b in open(os.path.join(ABS_PATH, 'sensitive_words.txt'), 'r'):
         word = b.strip().split('\t')[0]
         weight =  b.strip().split('\t')[1]
         sensitive_words_weight[word] =  weight

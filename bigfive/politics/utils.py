@@ -21,7 +21,7 @@ def get_hot_politics_list(keyword, page, size, order_name, order_type):
     query['size'] = str(size)
     if keyword:
         query['query']['bool']['should'] += [{"wildcard":{"politics_name": "*{}*".format(keyword)}},{"match":{"keywords": "{}".format(keyword)}}]
-    print(query)
+    # print(query)
     hits = es.search(index='politics_information', doc_type='text', body=query)['hits']
 
     result = {'rows': [], 'total': hits['total']}
@@ -53,5 +53,37 @@ def post_create_hot_politics(politics_name, keywords, location, start_date, end_
         "end_date": end_date
     }
     es.index(index='politics_information', doc_type='text', body=hot_politics, id=politics_id)
+
 def post_delete_hot_politics(politics_id):
     es.delete(index='politics_information', doc_type='text', id=politics_id)
+
+def get_politics_personality(politics_id,sentiment):
+    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}},{"term":{"sentiment":sentiment}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
+    hits = es.search(index='politics_personality',doc_type='text',body=query_body)['hits']['hits']
+    result = {'BigV':{},'ordinary':{}}
+    for hit in hits:
+        item = hit['_source']
+        for k,v in item.items():
+            if 'label' in k:
+                if v['high'] != 0:
+                    result[item['user_type']].update({PERSONALITY_EN_CH[k.split('_')[0]]+'(高)':v['high']})
+                if v['low'] !=0:
+                    result[item['user_type']].update({PERSONALITY_EN_CH[k.split('_')[0]]+'(低)':v['low']})
+    return result
+
+def get_politics_topic(politics_id,sentiment):
+    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}},{"term":{"sentiment":sentiment}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
+    hits = es.search(index='politics_topic',doc_type='text',body=query_body)['hits']['hits']
+    result = {'BigV':{},'ordinary':{}}
+    for hit in hits:
+        item = hit['_source']
+        for k,v in item.items():
+            if 'topic' not in k:
+                continue
+            if k.split('_')[-1] not in result[item['user_type']].keys():
+                result[item['user_type']][k.split('_')[-1]] = {}
+            if 'key_words_topic' in k:
+                result[item['user_type']][k.split('_')[-1]].update({'ciyun':{i['keyword']:i['value'] for i in v}})
+            elif 'weibo_topic' in k:
+                result[item['user_type']][k.split('_')[-1]].update({'weibo':v})
+    return result

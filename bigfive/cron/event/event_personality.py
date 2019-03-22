@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import sys
-sys.path.append('../')
+sys.path.append('../../')
 from config import *
 from time_utils import *
 from global_utils import * 
@@ -83,8 +83,8 @@ def get_event_personality(event_id, event_mapping_name, user_list, start_date, e
         es_result_low = es.search(index= USER_RANKING ,doc_type="text",body=query_body_low)["hits"]["hits"]
         es_result_high = es.search(index= USER_RANKING ,doc_type="text",body=query_body_high)["hits"]["hits"]
 
-        high_user_list = [i["_id"] for i in es_result_low]
-        low_user_list = [i["_id"] for i in es_result_high]
+        low_user_list = [i["_id"] for i in es_result_low]
+        high_user_list = [i["_id"] for i in es_result_high]
 
         event_query_body_high = {
                     "query":{
@@ -134,9 +134,9 @@ def get_event_personality(event_id, event_mapping_name, user_list, start_date, e
                     "aggs":{"sentiment_aggs":{"terms":{"field":"sentiment"}}}
         }
 
-        res = es.search(index=event_mapping_name,doc_type="text",body=event_query_body_low)
-        event_result_low = res["aggregations"]["sentiment_aggs"]["buckets"]
-        es_result_1 = res["hits"]["hits"]
+        res_2 = es.search(index=event_mapping_name,doc_type="text",body=event_query_body_low)
+        event_result_low = res_2["aggregations"]["sentiment_aggs"]["buckets"]
+        es_result_1 = res_2["hits"]["hits"]
 
         mid_list_1 = []
         if es_result_1 != []:
@@ -146,13 +146,27 @@ def get_event_personality(event_id, event_mapping_name, user_list, start_date, e
 
         personality_dict[str(personality_label.split("_label")[0])+"_high"] = event_result_high
         personality_dict[str(personality_label.split("_label")[0])+"_low"] = event_result_low
-       
-    es.index(index='event_personality', doc_type='text', id=str(event_id)+"_"+str(date2ts(end_date)), body = personality_dict)
+    
+    id_body = {
+            "query":{
+                "ids":{
+                    "type":"text",
+                    "values":[
+                        str(event_id)+"_"+str(date2ts(end_date))
+                    ]
+                }
+            }
+        }
+    if es.search(index="event_personality", doc_type='text', body= id_body)["hits"]["hits"] != []:
+        es.update(index='event_personality', doc_type='text', id=str(event_id)+"_"+str(date2ts(end_date)), body = {"doc":personality_dict})
+    else:
+        es.index(index='event_personality', doc_type='text', id=str(event_id)+"_"+str(date2ts(end_date)), body = personality_dict)
 
 
 
 if __name__ == '__main__':
+    EVENT_INFORMATION_2 = "event_ceshishijianba_1553071017"
 
     user_list = get_user_list(EVENT_INFORMATION_2)
-    get_event_personality(user_list,EVENT_INFORMATION_2,"2016-11-13","2016-11-27")
+    get_event_personality("ceshishijianba_1553071017",EVENT_INFORMATION_2,user_list,"2016-11-13","2016-11-27")
     

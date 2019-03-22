@@ -46,3 +46,16 @@ def delete_hot_politics():
     politics_id = parameters.get('pid', '')
     post_delete_hot_politics(politics_id)
     return jsonify(1)
+
+@mod.route('/politics_personality/', methods=['GET'])
+def politics_personality():
+    politics_id = request.args.get('pid')
+    sentiment = request.args.get('sentiment')
+    result = get_politics_personality(politics_id,sentiment)
+    return jsonify(result)
+@mod.route('/politics_topic/', methods=['GET'])
+def politics_topic():
+    politics_id = request.args.get('pid')
+    sentiment = request.args.get('sentiment')
+    result = get_politics_topic(politics_id,sentiment)
+    return jsonify(result)
