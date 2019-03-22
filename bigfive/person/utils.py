@@ -124,9 +124,9 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
             item['_source']['big_five_list'].append({'神经质': '1'})
 
         if item['_source']['machiavellianism_label'] == 0:
-            item['_source']['dark_list'].append({'马基雅维里主义': '0'})
+            item['_source']['dark_list'].append({'马基雅维利主义': '0'})
         if item['_source']['machiavellianism_label'] == 2:
-            item['_source']['dark_list'].append({'马基雅维里主义': '1'})
+            item['_source']['dark_list'].append({'马基雅维利主义': '1'})
         if item['_source']['psychopathy_label'] == 0:
             item['_source']['dark_list'].append({'精神病态': '0'})
         if item['_source']['psychopathy_label'] == 2:
