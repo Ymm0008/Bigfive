@@ -39,12 +39,12 @@ def find_label(text,ds_dict,ds_count):
     s_data = ['anger','anx','sad','awful']#第二层分类标签
     domain_s = start_p(s_data)
 
-    for d_k,d_v in ds_dict.iteritems():
+    for d_k,d_v in ds_dict.items():
         domain_s[d_k] = sum([text.count(v) for v in d_v])
 
     max_s = 0
     label_s = 'other'
-    for k1,v1 in domain_s.iteritems():
+    for k1,v1 in domain_s.items():
         domain_s[k1] = float(v1)/float(ds_count[k1])
         if domain_s[k1] > max_s:
             max_s = domain_s[k1]

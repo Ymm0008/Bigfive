@@ -114,8 +114,8 @@ def cut_filter(w_text):
     w_text = a1.sub('',w_text)
     a1 = re.compile(r'\@.*?\s')
     w_text = a1.sub('',w_text)
-    a1 = re.compile(r'\w',re.L)
-    w_text = a1.sub('',w_text)
+    a1 = re.compile(b'\w',re.L)#python2的检索单词功能，对python3支持不好，需要编码成bytes形式
+    w_text = a1.sub(b'',w_text.encode('utf-8')).decode('utf-8')
     if w_text == '转发微博':
         w_text = ''
 
