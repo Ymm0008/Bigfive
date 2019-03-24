@@ -60,15 +60,16 @@ def post_delete_hot_politics(politics_id):
 def get_politics_personality(politics_id,sentiment):
     query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}},{"term":{"sentiment":sentiment}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
     hits = es.search(index='politics_personality',doc_type='text',body=query_body)['hits']['hits']
-    result = {'BigV':{},'ordinary':{}}
+    result = {'BigV':{'high': {}, 'low': {}}, 'ordinary': {'high': {}, 'low': {}}}
     for hit in hits:
         item = hit['_source']
         for k,v in item.items():
             if 'label' in k:
                 if v['high'] != 0:
-                    result[item['user_type']].update({PERSONALITY_EN_CH[k.split('_')[0]]+'(高)':v['high']})
+                    print(item['user_type'])
+                    result[item['user_type']]['high'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['high']})
                 if v['low'] !=0:
-                    result[item['user_type']].update({PERSONALITY_EN_CH[k.split('_')[0]]+'(低)':v['low']})
+                    result[item['user_type']]['low'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['low']})
     return result
 
 def get_politics_topic(politics_id,sentiment):

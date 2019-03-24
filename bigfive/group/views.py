@@ -64,8 +64,8 @@ def group_ranking():
     page = parameters.get('page', '1')
     size = parameters.get('size', '10')
     order_dict = parameters.get('order_dict', {})
-    order_name = parameters.get('order_name', 'group_name')
-    order_type = parameters.get('order_type', 'asc')
+    order_name = parameters.get('order_name', 'influence_index')
+    order_type = parameters.get('order_type', 'desc')
 
     result = search_group_ranking(keyword, page, size, order_name, order_type, order_dict)
     return jsonify(result)

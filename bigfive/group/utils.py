@@ -105,12 +105,14 @@ def search_group_ranking(keyword, page, size, order_name, order_type, order_dict
     size = size if size else '10'
     sort_list = []
     if order_dict:
-        for order_name, order_type in json.loads(order_dict).items():
-            sort_list.append({order_name: {"order": "desc"}}) if order_type else sort_list.append(
-                {order_name: {"order": "asc"}})
+        for o_n, o_t in json.loads(order_dict).items():
+            sort_list.append({o_n: {"order": "desc"}}) if o_t else sort_list.append(
+                {o_n: {"order": "asc"}})
 
-    order_name = order_name if order_name else 'group_name'
-    order_type = order_type if order_type else 'asc'
+    if order_name == 'name':
+        order_name = 'group_name'
+    order_name = order_name if order_name else 'influence_index'
+    order_type = order_type if order_type else 'desc'
     sort_list.append({order_name: {"order": order_type}})
 
     # 数据库中有些数据没有label字段，过滤掉这些数据

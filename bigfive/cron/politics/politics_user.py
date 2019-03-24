@@ -59,7 +59,7 @@ def get_politics_user(politics_id,politic_mapping_name):
             for item in es_result:
                 if item["_source"]["sentiment"] != 0:
                     if item["_source"]["sentiment"] == 1: #积极用户
-                        if item["_source"]["user_fansnum"] >= 1000:
+                        if item["_source"]["user_fansnum"] >= 100000:
                             mid_user["positive"]["bigv_user"].append(item["_id"])
                             if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["p_bigv_user"]:
                                 uid_user["p_bigv_user"].append(item["_source"]["uid"])
@@ -68,7 +68,7 @@ def get_politics_user(politics_id,politic_mapping_name):
                             if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["p_ordinary_user"]:
                                 uid_user["p_ordinary_user"].append(item["_source"]["uid"])
                     else:#消极用户
-                        if item["_source"]["user_fansnum"] >= 1000:
+                        if item["_source"]["user_fansnum"] >= 100000:
                             mid_user["negative"]["bigv_user"].append(item["_id"])
                             if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["n_bigv_user"]:
                                 uid_user["n_bigv_user"].append(item["_source"]["uid"])

@@ -110,6 +110,7 @@ def get_geo(event_id,geo,s, e):
         s = get_before_date(30)
     st = date2ts(s)
     et = date2ts(e)
+    abroad_count = es.search(index='event_'+event_id, doc_type='text', body={'query': {'bool': {'must': [], 'must_not': [{'terms': {'geo': ['中国', '局域网']}}]}}, 'from': 0, 'size': 5000})['hits']['total']
     query = {"query": {"bool": {"must": [{"wildcard": {"geo": "*{}*".format(geo)}}, {"range": {"timestamp": {"gte": st, "lte": et}}}], "must_not": [], "should": []}}, "from": 0, "size": 100000, "sort": [], "aggs": {}}
     hits = es.search(index='event_'+event_id,
                      doc_type='text', body=query,_source_include=['geo'])['hits']['hits']
@@ -151,10 +152,10 @@ def get_geo(event_id,geo,s, e):
         else:
             geo_dic[city] += 1
     # 通过省条数排名
-
+    if geo == '中国':
+        geo_dic.update({'国外': abroad_count})
     result= {'city':geo_dic,'rank':[]}
     result['rank'] = [{i[0]:i[1]} for i in sorted(geo_dic.items(), key=lambda x: x[1], reverse=True)[:15]]
-
     return result
 
 

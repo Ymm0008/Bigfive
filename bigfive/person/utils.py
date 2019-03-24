@@ -32,12 +32,12 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     size = size if size else '10'
     sort_list = []
     if order_dict:
-        for order_name, order_type in json.loads(order_dict).items():
-            sort_list.append({order_name: {"order": "desc"}}) if order_type else sort_list.append({order_name: {"order": "asc"}})
-    # if order_name == 'name':
-    #     order_name = 'username'
-    order_name = order_name if order_name else 'username'
-    order_type = order_type if order_type else 'asc'
+        for o_n, o_t in json.loads(order_dict).items():
+            sort_list.append({o_n: {"order": "desc"}}) if o_t else sort_list.append({o_n: {"order": "asc"}})
+    if order_name == 'name':
+        order_name = 'username'
+    order_name = order_name if order_name else 'influence_index'
+    order_type = order_type if order_type else 'desc'
     sort_list.append({order_name: {"order": order_type}})
 
     machiavellianism_index = machiavellianism_index if machiavellianism_index else 0
@@ -94,6 +94,7 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     # query['sort'] = [{i: {'order': order_type}} for i in order_name.split(',')]
     # query['sort'] = [{order_name: {"order": order_type}}]
 
+    print(query)
     hits = es.search(index='user_ranking', doc_type='text', body=query)['hits']
 
     result = {'rows': [], 'total': hits['total']}
@@ -123,9 +124,9 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
             item['_source']['big_five_list'].append({'神经质': '1'})
 
         if item['_source']['machiavellianism_label'] == 0:
-            item['_source']['dark_list'].append({'马基雅维里主义': '0'})
+            item['_source']['dark_list'].append({'马基雅维利主义': '0'})
         if item['_source']['machiavellianism_label'] == 2:
-            item['_source']['dark_list'].append({'马基雅维里主义': '1'})
+            item['_source']['dark_list'].append({'马基雅维利主义': '1'})
         if item['_source']['psychopathy_label'] == 0:
             item['_source']['dark_list'].append({'精神病态': '0'})
         if item['_source']['psychopathy_label'] == 2:
