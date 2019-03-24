@@ -7,6 +7,7 @@ import csv
 import sys
 from gensim import corpora
 sys.path.append('../../../')
+sys.path.append('../')
 from sentiment_classification.utils import *
 from sentiment_classification.flow_psy import flow_psychology_classfiy
 from scws_utils import fc
@@ -150,7 +151,8 @@ def triple_classifier(tweet):
 
 
 if __name__ == '__main__':
-    tweet = {'text':'村霸存心不良，挖空心思贿选霸政权之祸国殃民！ 举报广州白云区人和镇明星村，某些道貌岸然的村霸干部！'}
+    # tweet = {'text':'村霸存心不良，挖空心思贿选霸政权之祸国殃民！ 举报广州白云区人和镇明星村，某些道貌岸然的村霸干部！'}
+    tweet = {'text': '还是要+点肉//@爱心china桃:没肉不好吃～'}
     domain = triple_classifier(tweet)
     print(domain)
 
