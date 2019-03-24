@@ -12,6 +12,7 @@ from user_text_analyze import get_word_analysis
 from user_emotion import cal_user_emotion
 from user_social import cal_user_social
 from user_influence import cal_user_influence
+from user_activity import get_user_weibo_type
 
 #weibo_data_dict{"day1":[微博数据列表],"day2":[微博数据列表]}
 def get_weibo_data_dict(uid, start_date,end_date):
@@ -51,6 +52,8 @@ def user_portrait(uid, start_date,end_date):
     print('Calculating user domain...')
     get_user_domain(uid,start_date,end_date)
 
+    print('Calculating user activity...')
+    get_user_weibo_type(uid,weibo_data_dict,start_date,end_date)
 
     print('Calculating user political...')
     get_user_political(uid, start_date,end_date)
@@ -62,9 +65,7 @@ def user_portrait(uid, start_date,end_date):
     emo_time_s = time.time()
     cal_user_emotion(uid,weibo_data_dict)
     emo_time_e = time.time()
-    print('Calculating user emotion time:',emo_time_e-emo_time_s)
-
-    
+    print('Calculating user emotion time:',emo_time_e-emo_time_s)  
 
     print('Calculating user social...')
     s_s_time = time.time()
