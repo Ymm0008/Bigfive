@@ -18,6 +18,7 @@ def cal_user_social(uid,weibo_data_dict):
         es_timestamp = date2ts(day)
         sum_r = len(weibo_list)
         if sum_r :#此天有微博数据
+            #print(weibo_list)
             for weibo_item in weibo_list: #weibo_item为字典
                 if weibo_item["_source"]["message_type"] == 2 or weibo_item["_source"]["message_type"] == 3:
                     source = weibo_item["_source"]["root_uid"]

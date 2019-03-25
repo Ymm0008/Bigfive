@@ -130,7 +130,7 @@ def get_politics_user(politics_id,politic_mapping_name):
         
     
 if __name__ == "__main__":
-    '''
+    
     s_t = time.time()
     get_politics_user("ceshizhengceyi_1552983497","politics_ceshizhengceyi_1552983497")
     e_t = time.time()
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     get_politics_user("ceshizhengceer_1553060528","politics_ceshizhengceer_1553060528")
     e_t1 = time.time()
     print ("time",e_t1 - s_t1)
-    '''
+    
     pass
 
 

@@ -24,7 +24,9 @@ def cal_user_emotion(uid,weibo_data_dict):
             for weibo_item in weibo_list: #weibo_item为字典
                 tweet = {}
                 tweet["text"] = weibo_item["_source"]["text"]
+                print("tweet",tweet)
                 sentiment = triple_classifier(tweet) 
+                print("sentiment",sentiment)
                 es_weibo.update(index = weibo_item["_index"],doc_type = weibo_item["_type"],id = weibo_item["_id"],body = {"doc":{"sentiment":sentiment}})
                 if sentiment not in sentiment_dict:
                     sentiment_dict[sentiment] = 1
@@ -33,12 +35,12 @@ def cal_user_emotion(uid,weibo_data_dict):
             for j in range(0,7):
                 if j not in sentiment_dict:
                     sentiment_dict[j] = 0
-            es.index(index = "user_emotion",doc_type = "text",id = str(uid)+ "_"+str(es_timestamp), body = {"timestamp":es_timestamp,"uid": uid, "nuetral":  sentiment_dict[0], "positive": sentiment_dict[1], "negtive":sum_r-sentiment_dict[0]-sentiment_dict[1],"date":day})
-            #print(uid,es_timestamp,sentiment_dict,sentiment_dict[0],sum_r,day)
-            #print("================")
+            #es.index(index = "user_emotion",doc_type = "text",id = str(uid)+ "_"+str(es_timestamp), body = {"timestamp":es_timestamp,"uid": uid, "nuetral":  sentiment_dict[0], "positive": sentiment_dict[1], "negtive":sum_r-sentiment_dict[0]-sentiment_dict[1],"date":day})
+            print(uid,es_timestamp,sentiment_dict,sentiment_dict[0],sum_r,day)
+            print("================")
         else:
             es.index(index = "user_emotion",doc_type = "text",id = str(uid)+ "_"+str(es_timestamp), body = {"timestamp":es_timestamp,"uid": uid, "nuetral":  0, "positive": 0, "negtive":0,"date":day})
-            #print("no data")
+            print("no data")
         
 
 

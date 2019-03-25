@@ -86,13 +86,17 @@ black_word = set(load_black_words())
 
 def cut(s, text, f=None, cx=False):
     if f:
-        tks = [token for token
-               in s.participle(cut_filter(text))
-               if token[1] in f and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word]
+        tks = []
+        for token in s.get_text_fc(cut_filter(text)):
+            if len(token)>=2:
+                if token[1] in cx_dict and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word:
+                    tks.append(token)
     else:
-        tks = [token for token
-               in s.participle(cut_filter(text))
-               if token[1] in cx_dict and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word]
+        tks = []
+        for token in s.get_text_fc(cut_filter(text)):
+            if len(token)>=2:
+                if token[1] in cx_dict and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word:
+                    tks.append(token)
 
     if cx:
         return tks
