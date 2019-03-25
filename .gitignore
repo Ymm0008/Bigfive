@@ -7,4 +7,4 @@ __pycache__
 test.*
 head_images/
 head_images/*.jpg
-bigfive/cron/politics/LDA_new
+bigfive/cron/politics/LDA
