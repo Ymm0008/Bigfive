@@ -66,7 +66,7 @@ def get_politics_personality(politics_id,sentiment):
         for k,v in item.items():
             if 'label' in k:
                 if v['high'] != 0:
-                    print(item['user_type'])
+                    # print(item['user_type'])
                     result[item['user_type']]['high'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['high']})
                 if v['low'] !=0:
                     result[item['user_type']]['low'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['low']})
