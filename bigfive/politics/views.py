@@ -53,9 +53,15 @@ def politics_personality():
     sentiment = request.args.get('sentiment')
     result = get_politics_personality(politics_id,sentiment)
     return jsonify(result)
+
 @mod.route('/politics_topic/', methods=['GET'])
 def politics_topic():
     politics_id = request.args.get('pid')
     sentiment = request.args.get('sentiment')
     result = get_politics_topic(politics_id,sentiment)
+    return jsonify(result)
+@mod.route('/politics_statistics/', methods=['GET'])
+def politics_statistics():
+    politics_id = request.args.get('pid')
+    result = get_politics_statistics(politics_id)
     return jsonify(result)
