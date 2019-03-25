@@ -331,6 +331,64 @@ def user_emotion(uid, interval):
         result["nuetral_line"].append(bucket['nuetral']['value'])
     return result
 
+def get_user_behavior(uid, interval):
+    query_body = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "term": {
+                            "uid": uid
+                        }
+                    }
+                ]
+            }
+        },
+        "from": 0,
+        "size": 0,
+        "sort": [],
+        "aggs": {
+            "groupDate": {
+                "date_histogram": {
+                    "field": "date",
+                    "interval": interval,
+                    "format": "yyyy-MM-dd"
+                },
+                "aggs": {
+                    "original": {
+                        "sum": {
+                            "field": "original"
+                        }
+                    },
+                    "retweet": {
+                        "sum": {
+                            "field": "retweet"
+                        }
+                    },
+                    "comment": {
+                        "sum": {
+                            "field": "comment"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    buckets = es.search(index="user_weibo_type", doc_type="text", body=query_body)['aggregations']['groupDate']['buckets']
+    result = {
+        'time': [],
+        "original_line": [],
+        "retweet_line": [],
+        "comment_line": []
+    }
+    for bucket in buckets:
+        result['time'].append(bucket['key_as_string'], )
+        result["original_line"].append(bucket['original']['value'], )
+        result["retweet_line"].append(bucket['retweet']['value'], )
+        result["comment_line"].append(bucket['comment']['value'])
+    return result
+
 
 def get_user_activity(uid):
 
