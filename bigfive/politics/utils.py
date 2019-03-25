@@ -98,8 +98,8 @@ def get_politics_statistics(politics_id):
     r = es.search(index='politics_topic',doc_type='text',body=query_body)
     buckets = r['aggregations']['statistics']['buckets']
     total = r['hits']['total']
-    result = {'total':total}
+    result = {'total':total,"negative": 0,"negative_pro": '0%',"positive": 0,"positive_pro": '0%'}
     for bucket in buckets:
         result[bucket['key']] = bucket['doc_count']
-        result[bucket['key']+'_pro'] = bucket['doc_count']/total
+        result[bucket['key']+'_pro'] = "%d%%" % (bucket['doc_count']/total * 100)
     return result
