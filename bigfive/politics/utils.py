@@ -10,7 +10,7 @@ from bigfive.cache import cache
 from bigfive.time_utils import *
 
 def get_hot_politics_list(keyword, page, size, order_name, order_type):
-    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}}, "from": 0, "size": 10, "sort": [{"create_time":{"order":"desc"}}], "aggs": {}}
+    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}}, "from": 0, "size": 10, "sort": [], "aggs": {}}
     page = page if page else '1'
     size = size if size else '10'
     order_name = 'politics_name' if order_name == 'name' else order_name
@@ -66,14 +66,14 @@ def get_politics_personality(politics_id,sentiment):
         for k,v in item.items():
             if 'label' in k:
                 if v['high'] != 0:
-                    print(item['user_type'])
+                    # print(item['user_type'])
                     result[item['user_type']]['high'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['high']})
                 if v['low'] !=0:
                     result[item['user_type']]['low'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['low']})
     return result
 
 def get_politics_topic(politics_id,sentiment):
-    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}},{"term":{"sentiment":sentiment}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
+    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}},{"term":{"sentiment":sentiment}}],"must_not":[],"should":[]}},"from":0,"size":1000,"sort":[],"aggs":{}}
     hits = es.search(index='politics_topic',doc_type='text',body=query_body)['hits']['hits']
     result = {'BigV':{},'ordinary':{}}
     for hit in hits:
@@ -86,5 +86,20 @@ def get_politics_topic(politics_id,sentiment):
             if 'key_words_topic' in k:
                 result[item['user_type']][k.split('_')[-1]].update({'ciyun':{i['keyword']:i['value'] for i in v}})
             elif 'weibo_topic' in k:
-                result[item['user_type']][k.split('_')[-1]].update({'weibo':v})
+                mid_list = [i['mid'] for i in v]
+                query = {"query":{"bool":{"must":[{"terms":{"mid":mid_list}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
+                r = es.search(index='politics_'+politics_id,doc_type='text',body=query)['hits']['hits']
+                if r:
+                    result[item['user_type']][k.split('_')[-1]].update({'weibo':[j['_source'] for j in r]})
+    return result
+
+def get_politics_statistics(politics_id):
+    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}}],"must_not":[],"should":[]}},"from":0,"size":0,"sort":[],"aggs":{"statistics": {"terms": {"field": "sentiment"}}}}
+    r = es.search(index='politics_topic',doc_type='text',body=query_body)
+    buckets = r['aggregations']['statistics']['buckets']
+    total = r['hits']['total']
+    result = {'total':total,"negative": 0,"negative_pro": '0%',"positive": 0,"positive_pro": '0%'}
+    for bucket in buckets:
+        result[bucket['key']] = bucket['doc_count']
+        result[bucket['key']+'_pro'] = "%d%%" % (bucket['doc_count']/total * 100)
     return result

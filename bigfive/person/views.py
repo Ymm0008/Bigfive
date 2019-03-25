@@ -7,7 +7,7 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime, timedelta
 
 from bigfive.person.utils import es, user_emotion, user_social_contact, user_preference, portrait_table, \
-    delete_by_id, get_influence_feature, get_user_activity, get_preference_identity, get_basic_info
+    delete_by_id, get_influence_feature, get_user_activity, get_preference_identity, get_basic_info,get_user_behavior
 
 mod = Blueprint('person', __name__, url_prefix='/person')
 
@@ -83,6 +83,14 @@ def influence_feature():
     uid = request.args.get('person_id')
     interval = request.args.get('type','day')
     result = get_influence_feature(uid,interval)
+    return jsonify(result)
+
+# 活动特征 --转发 评论 原创
+@mod.route('/person_behavior', methods=['POST', 'GET'])
+def person_behavior():
+    uid = request.args.get('person_id')
+    interval = request.args.get('type','day')
+    result = get_user_behavior(uid,interval)
     return jsonify(result)
 
 

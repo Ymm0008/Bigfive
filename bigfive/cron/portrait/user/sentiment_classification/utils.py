@@ -86,13 +86,17 @@ black_word = set(load_black_words())
 
 def cut(s, text, f=None, cx=False):
     if f:
-        tks = [token for token
-               in s.participle(cut_filter(text))
-               if token[1] in f and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word]
+        tks = []
+        for token in s.get_text_fc(cut_filter(text)):
+            if len(token)>=2:
+                if token[1] in cx_dict and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word:
+                    tks.append(token)
     else:
-        tks = [token for token
-               in s.participle(cut_filter(text))
-               if token[1] in cx_dict and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word]
+        tks = []
+        for token in s.get_text_fc(cut_filter(text)):
+            if len(token)>=2:
+                if token[1] in cx_dict and (3 < len(token[0]) < 30 or token[0] in single_word_whitelist) and token[0] not in black_word:
+                    tks.append(token)
 
     if cx:
         return tks
@@ -114,8 +118,8 @@ def cut_filter(w_text):
     w_text = a1.sub('',w_text)
     a1 = re.compile(r'\@.*?\s')
     w_text = a1.sub('',w_text)
-    a1 = re.compile(r'\w',re.L)
-    w_text = a1.sub('',w_text)
+    a1 = re.compile(b'\w',re.L)#python2的检索单词功能，对python3支持不好，需要编码成bytes形式
+    w_text = a1.sub(b'',w_text.encode('utf-8')).decode('utf-8')
     if w_text == '转发微博':
         w_text = ''
 
