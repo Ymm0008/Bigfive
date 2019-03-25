@@ -73,7 +73,7 @@ def get_politics_personality(politics_id,sentiment):
     return result
 
 def get_politics_topic(politics_id,sentiment):
-    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}},{"term":{"sentiment":sentiment}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
+    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}},{"term":{"sentiment":sentiment}}],"must_not":[],"should":[]}},"from":0,"size":1000,"sort":[],"aggs":{}}
     hits = es.search(index='politics_topic',doc_type='text',body=query_body)['hits']['hits']
     result = {'BigV':{},'ordinary':{}}
     for hit in hits:
@@ -86,5 +86,20 @@ def get_politics_topic(politics_id,sentiment):
             if 'key_words_topic' in k:
                 result[item['user_type']][k.split('_')[-1]].update({'ciyun':{i['keyword']:i['value'] for i in v}})
             elif 'weibo_topic' in k:
-                result[item['user_type']][k.split('_')[-1]].update({'weibo':v})
+                mid_list = [i['mid'] for i in v]
+                query = {"query":{"bool":{"must":[{"terms":{"mid":mid_list}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
+                r = es.search(index='politics_'+politics_id,doc_type='text',body=query)['hits']['hits']
+                if r:
+                    result[item['user_type']][k.split('_')[-1]].update({'weibo':[j['_source'] for j in r]})
+    return result
+
+def get_politics_statistics(politics_id):
+    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}}],"must_not":[],"should":[]}},"from":0,"size":0,"sort":[],"aggs":{"statistics": {"terms": {"field": "sentiment"}}}}
+    r = es.search(index='politics_topic',doc_type='text',body=query_body)
+    buckets = r['aggregations']['statistics']['buckets']
+    total = r['hits']['total']
+    result = {'total':total}
+    for bucket in buckets:
+        result[bucket['key']] = bucket['doc_count']
+        result[bucket['key']+'_pro'] = bucket['doc_count']/total
     return result
