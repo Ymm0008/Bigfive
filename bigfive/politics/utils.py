@@ -94,12 +94,16 @@ def get_politics_topic(politics_id,sentiment):
     return result
 
 def get_politics_statistics(politics_id):
-    query_body = {"query":{"bool":{"must":[{"term":{"politics_id":politics_id}}],"must_not":[],"should":[]}},"from":0,"size":0,"sort":[],"aggs":{"statistics": {"terms": {"field": "sentiment"}}}}
-    r = es.search(index='politics_topic',doc_type='text',body=query_body)
+    query_body = {"size":0,"aggs":{"statistics": {"terms": {"field": "sentiment"}}}}
+    r = es.search(index='politics_'+ politics_id,doc_type='text',body=query_body)
     buckets = r['aggregations']['statistics']['buckets']
-    total = r['hits']['total']
-    result = {'total':total,"negative": 0,"negative_pro": '0%',"positive": 0,"positive_pro": '0%'}
+    result = {'total':0,"negative": 0,"negative_pro": '0%',"positive": 0,"positive_pro": '0%'}
     for bucket in buckets:
-        result[bucket['key']] = bucket['doc_count']
-        result[bucket['key']+'_pro'] = "%d%%" % (bucket['doc_count']/total * 100)
+        if bucket['key'] == '1':
+            result['positive'] = bucket['doc_count']
+        elif bucket['key']>'1':
+            result['negative'] += bucket['doc_count']
+    result['total'] = result['positive'] + result['negative']
+    result['negative_pro'] = "%d%%" % (result['negative']/result['total'] * 100)
+    result['positive_pro'] = "%d%%" % (result['positive']/result['total'] * 100)
     return result
