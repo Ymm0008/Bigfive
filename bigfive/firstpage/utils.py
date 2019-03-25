@@ -452,9 +452,9 @@ def image_arrange(group_id):
     # for uid in user_list:
     #     image_names.append(uid + '.jpg')
 
-    # IMAGES_PATH = 'head_images/'  # 图片集地址
-    # IMAGE_SIZE = 256  # 每张小图片的大小
-    # IMAGE_SAVE_PATH = 'head_images/' + group_id + '.jpg'  # 图片转换后的地址
+    IMAGES_PATH = 'head_images/'  # 图片集地址
+    IMAGE_SIZE = 256  # 每张小图片的大小
+    IMAGE_SAVE_PATH = 'head_images/' + group_id + '.jpg'  # 图片转换后的地址
     # # image_names = [image.split('\\')[-1] for image in read_files(IMAGES_PATH)]
 
     # # 简单的对于参数的设定和实际图片集的大小进行数量判断
@@ -492,7 +492,8 @@ def image_arrange(group_id):
     #     IMAGE_ROW = 3
     #     IMAGE_COLUMN = 3
     #     image_names = image_names[0:9]
-    # if not image_names:
+    IMAGE_ROW = 3
+    IMAGE_COLUMN = 3
     image_names = random.sample(paths('head_images'),9)
     to_image = Image.new('RGB', (IMAGE_COLUMN * IMAGE_SIZE, IMAGE_ROW * IMAGE_SIZE))  # 创建一个新图
     # 循环遍历，把每张图片按顺序粘贴到对应位置上
