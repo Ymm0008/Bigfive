@@ -1,3 +1,6 @@
+# -*- coding: UTF-8 -*-
+
+
 import time
 import sys
 import json
@@ -92,6 +95,8 @@ def politics_main(keywords, politics_id, start_date, end_date):
 
     print('Successfully create politics...')
 
+
+
 if __name__ == '__main__':
     user_main(['1663765234','3217540085'],[],'2016-11-13','2016-11-16')
     # group_main(1,2,3,4,5)
@@ -183,4 +188,4 @@ if __name__ == '__main__':
 
     # # es.delete(index='event_information',doc_type='text',id='ceshishijianliu_1552978686')
 
-    # pass
+    pass
