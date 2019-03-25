@@ -1,3 +1,6 @@
+# -*- coding: UTF-8 -*-
+
+
 import time
 import sys
 import json
@@ -25,10 +28,10 @@ from politics_mapping import create_politics_mapping
 #对用户进行批量计算，流数据接入时会自动入库批量计算
 def user_main(uid_list,username_list, start_date, end_date):
     print('Start calculating user personality...')
-    cal_user_personality(uid_list, start_date, end_date)
+    #cal_user_personality(uid_list, start_date, end_date)
 
     print('Start calculating user text...')
-    cal_user_text_analyze(uid_list, start_date, end_date)
+    #cal_user_text_analyze(uid_list, start_date, end_date)
 
     print('Start calculating user portrait...')
     for uid in uid_list:
@@ -36,7 +39,7 @@ def user_main(uid_list,username_list, start_date, end_date):
         user_portrait(uid, start_date ,end_date)
     
     print('Start calculating user ranking...')
-    user_ranking(uid_list, username_list, end_date)
+    #user_ranking(uid_list, username_list, end_date)
 
     print('Successfully create user...')
 
@@ -91,6 +94,15 @@ def politics_main(keywords, politics_id, start_date, end_date):
     politics_portrait(politics_id, politics_mapping_name, userlist, start_date, end_date)
 
     print('Successfully create politics...')
+
+def get_uidlist():
+    query_body = {"query": {"bool": {"must": [{"match_all": { }}]}},"size":15000}
+    es_result = es.search(index="user_information", doc_type="text",body=query_body)["hits"]["hits"]
+    uid_list = []
+    for es_item in es_result:
+        uid_list.append(es_item["_id"])
+    #print (uid_list)
+    return uid_list
 
 if __name__ == '__main__':
     user_main(['1663765234','3217540085'],[],'2016-11-13','2016-11-16')
@@ -183,4 +195,4 @@ if __name__ == '__main__':
 
     # # es.delete(index='event_information',doc_type='text',id='ceshishijianliu_1552978686')
 
-    # pass
+    #pass

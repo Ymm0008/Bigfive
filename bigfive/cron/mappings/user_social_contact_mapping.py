@@ -44,12 +44,20 @@ index_info = {
                 },
                 "timestamp":{#网络关系类型
                     "type" : "long"
+                },
+                "count":{
+                    "type" : "long"
+                },
+                "date": {
+                    "format": "dateOptionalTime",
+                    "type": "date"
                 }
             }
         }
     }
 }
 
+#es.indices.delete(index = index_name)
 exist_indice = es.indices.exists(index = index_name)
 
 print(exist_indice)
