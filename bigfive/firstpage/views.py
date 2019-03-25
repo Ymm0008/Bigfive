@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint,request,jsonify,Response
+
 import json
+import os
+import traceback
 
 from bigfive.firstpage.utils import *
-import os
 
 mod = Blueprint('firstpage',__name__,url_prefix='/firstpage')
 
@@ -93,9 +95,13 @@ def head():
             try:
                 image_arrange(id)
             except:
+                traceback.print_exc()
                 return jsonify(0)
         else:
-            return jsonify(0)
+            # print(paths('head_images'))
+            img_path = random.choice(paths('head_images'))
+            # return jsonify(0)
     with open(img_path,'rb') as fp:
         img = fp.read()
     return Response(img,mimetype=mime)
+

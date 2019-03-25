@@ -10,7 +10,7 @@ from bigfive.cache import cache
 from bigfive.time_utils import *
 
 def get_hot_politics_list(keyword, page, size, order_name, order_type):
-    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}}, "from": 0, "size": 10, "sort": [{"create_time":{"order":"desc"}}], "aggs": {}}
+    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}}, "from": 0, "size": 10, "sort": [], "aggs": {}}
     page = page if page else '1'
     size = size if size else '10'
     order_name = 'politics_name' if order_name == 'name' else order_name
@@ -66,7 +66,7 @@ def get_politics_personality(politics_id,sentiment):
         for k,v in item.items():
             if 'label' in k:
                 if v['high'] != 0:
-                    print(item['user_type'])
+                    # print(item['user_type'])
                     result[item['user_type']]['high'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['high']})
                 if v['low'] !=0:
                     result[item['user_type']]['low'].update({PERSONALITY_EN_CH[k.split('_')[0]]:v['low']})

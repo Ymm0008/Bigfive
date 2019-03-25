@@ -94,7 +94,6 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     # query['sort'] = [{i: {'order': order_type}} for i in order_name.split(',')]
     # query['sort'] = [{order_name: {"order": order_type}}]
 
-    print(query)
     hits = es.search(index='user_ranking', doc_type='text', body=query)['hits']
 
     result = {'rows': [], 'total': hits['total']}
