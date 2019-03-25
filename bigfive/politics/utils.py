@@ -103,7 +103,7 @@ def get_politics_statistics(politics_id):
             result['positive'] = bucket['doc_count']
         elif bucket['key']>'1':
             result['negative'] += bucket['doc_count']
-    result['total'] = result['positive'] + result['negative']
+    result['total'] = r['hits']['total']
     result['negative_pro'] = "%d%%" % (result['negative']/result['total'] * 100)
     result['positive_pro'] = "%d%%" % (result['positive']/result['total'] * 100)
     return result
