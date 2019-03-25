@@ -26,6 +26,7 @@ USER_TEXT_ANALYSIS = 'user_text_analysis'
 USER_TEXT_ANALYSIS_STA = 'user_text_analysis_sta'
 USER_INFLUENCE = 'user_influence'
 USER_PERSONALITY = 'user_personality'
+WEIBO_USER = 'weibo_user'
 
 # group index
 GROUP_ACTIVITY = 'group_activity'

@@ -26,7 +26,7 @@ from cron_politics import politics_create, politics_portrait
 from politics_mapping import create_politics_mapping
 
 #对用户进行批量计算，流数据接入时会自动入库批量计算
-def user_main(uid_list,username_list, start_date, end_date):
+def user_main(uid_list, username_list, start_date, end_date):
     print('Start calculating user personality...')
     cal_user_personality(uid_list, start_date, end_date)
 
@@ -98,7 +98,7 @@ def politics_main(keywords, politics_id, start_date, end_date):
 
 
 if __name__ == '__main__':
-    user_main(['1663765234','3217540085'],[],'2016-11-13','2016-11-16')
+    user_main(['1978574705','2596620224'],['闱闱祯祯','时尚女生爱购物'],'2016-11-13','2016-11-27')
     # group_main(1,2,3,4,5)
 
     # event_name = "测试事件二"
