@@ -10,7 +10,7 @@ from bigfive.cache import cache
 from bigfive.time_utils import *
 
 def get_hot_politics_list(keyword, page, size, order_name, order_type):
-    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}}, "from": 0, "size": 10, "sort": [{"create_time":{"order":"desc"}}], "aggs": {}}
+    query = {"query": {"bool": {"must": [], "must_not": [], "should": []}}, "from": 0, "size": 10, "sort": [], "aggs": {}}
     page = page if page else '1'
     size = size if size else '10'
     order_name = 'politics_name' if order_name == 'name' else order_name
