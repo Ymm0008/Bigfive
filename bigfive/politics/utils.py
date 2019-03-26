@@ -91,6 +91,8 @@ def get_politics_topic(politics_id,sentiment):
                 r = es.search(index='politics_'+politics_id,doc_type='text',body=query)['hits']['hits']
                 if r:
                     result[item['user_type']][k.split('_')[-1]].update({'weibo':[j['_source'] for j in r]})
+                else:
+                    result[item['user_type']][k.split('_')[-1]].update({'weibo':[]})
     return result
 
 def get_politics_statistics(politics_id):
