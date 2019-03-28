@@ -415,10 +415,7 @@ def get_user(uid):
     query_body = {"query":{"bool":{"must":[{"term":{"uid":uid}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
     result = es.search(index=USER_INFORMATION, doc_type="text",body=query_body)["hits"]["hits"]
     if result != []:
-        # try:
         es_result = result[0]["_source"]
-        # except:
-        #     print(uid)
     else:
         return {uid:{"verified_type":"other","fans_num":0,"username":"","description":"","verified_type":999,"statusnum":0,\
                 "user_location":""}}
@@ -570,7 +567,7 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             }
         }
             # if es.search(index=USER_INFORMATION,doc_type='text', body=id_body2)["hits"]["hits"] != []:
-            es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":r_domain}})
+            # es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":r_domain}})
             # else:
             #     es.index(index=USER_INFORMATION,doc_type='text', id=str(uid),body = {"domain":r_domain,"uid":uid})
            
@@ -603,7 +600,7 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "topic_religion":0,
             "topic_social_security":0
                     } )
-            es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":r_domain}})
+        es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":r_domain}})
             # es.index(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"timestamp":timestamp,
             # "uid":uid,"domain":r_domain})
            
@@ -628,7 +625,7 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             }
         }
             # if es.search(index=USER_INFORMATION,doc_type='text', body=id_body2)["hits"]["hits"] != []:
-            es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":"other"}})
+            # es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":"other"}})
             # else:
             #     es.index(index=USER_INFORMATION,doc_type='text', id=str(uid),body = {"domain":"other","uid":uid})
             # es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":"other"}})
@@ -662,8 +659,7 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "topic_religion":0,
             "topic_social_security":0
                     } )
-            es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc"{\
-            "uid":uid,"domain":"other"}})
+        es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":"other"}})
             
 
 def get_user_domain(uid,start_date,end_date):
