@@ -8,6 +8,7 @@ import sys
 sys.path.append('../../../')
 from config import *
 from time_utils import *
+from global_utils import *
 
 
 
@@ -35,33 +36,49 @@ def new_mapping(uid_list):
         break
         
 
-def normalize_influence_index():
+def normalize_influence_index(start_date,end_date,day):
     target_max = 100
     target_min = 0
     index_list = ["importance","influence","activity","sensitivity"]
     aggs_max_dict = {}
-    aggs_max_dict = {"aggs": {"groupby": {"terms":{"field":"timestamp","size":15},"aggs":{"max_index":{"max":{}},"min_index":{"min":{}}}}}}
+    aggs_max_dict = {"query":{"range":{"date":{"gte":start_date,"lte":end_date}}},"size":0,"aggs": {"groupby": {"terms":{"field":"timestamp","size":day},"aggs":{"max_index":{"max":{}},"min_index":{"min":{}}}}}}
     for i in index_list :#对于每一个属性值
+        print(i)
         #aggs_max_dict = {"aggs": {"index": {"terms":{"field":"timestamp"}}}}
         aggs_max_dict["aggs"]["groupby"]["aggs"]["max_index"]["max"]["field"] = i
         aggs_max_dict["aggs"]["groupby"]["aggs"]["min_index"]["min"]["field"] = i
-        #print  (aggs_max_dict)
+        print  (aggs_max_dict)
+        #max_min_index = es.search(index="user_influence", doc_type="text", body = aggs_max_dict)
         max_min_index = es.search(index="user_influence", doc_type="text", body = aggs_max_dict)["aggregations"]["groupby"]["buckets"]
+       
         for j in max_min_index: #每一天 的每一个属性的最值
             query_body = {}
             timestamp = j["key"]
+            print(timestamp)
             max_index = j["max_index"]["value"]
             #print (max_index)
             min_index = j["min_index"]["value"]
             #print (min_index)
-            query_body = {"query": {"bool": {"must":{"term": {"timestamp":timestamp}}}},"size" : 20000}
-            user_info = es.search(index = "user_influence",doc_type = "text",body = query_body)["hits"]["hits"]
-            for user in user_info:
-                id_es = user["_id"]
-                new_index_value = (target_max-target_min)*(user["_source"][i] - min_index) /(max_index -min_index)+target_min
-                print(id_es,i,max_index,min_index,new_index_value)
-                es.update(index = "user_influence",doc_type = "text",id = id_es,body ={"doc":{i+"_normalization" :new_index_value}} )
-                 
+
+            
+            sort_dict = {'_id':{'order':'asc'}}
+            query_body = {"query": {"bool": {"must":{"term": {"timestamp":timestamp}}}}}
+            ESIterator1 = ESIterator(0,sort_dict,1000,"user_influence","text",query_body,es)
+            
+            while True:
+                try:
+                    #一千条es数据
+                    user_info = next(ESIterator1)
+                    for user in user_info:
+                        id_es = user["_id"]
+                        new_index_value = (target_max-target_min)*(user["_source"][i] - min_index) /(max_index -min_index)+target_min
+                        print(id_es,i,max_index,min_index,new_index_value)
+                        es.update(index = "user_influence",doc_type = "text",id = id_es,body ={"doc":{i+"_normalization" :new_index_value}} )
+                        
+                except StopIteration:
+                    #遇到StopIteration就退出循环
+                    break
+     
 
 
         
@@ -72,8 +89,8 @@ def normalize_influence_index():
         
          
 if __name__ == '__main__':
-    uid_list = get_uidlist()
+    #uid_list = get_uidlist()
     #new_mapping(uid_list)
-    normalize_influence_index()
+    normalize_influence_index("2016-11-13","2016-11-27",15)
     
     
