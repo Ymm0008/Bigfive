@@ -340,7 +340,7 @@ def wordCount(segment_list):
         在制作词云的过程中用不到，主要是在画词频统计图时用到。
     '''
     stopwords = stopwordslist()
-    # print len(stopwords)
+    
     word_lst = []
     word_dict = {}
    
@@ -413,9 +413,12 @@ def get_uid_weibo(uid,index_name):
 def get_user(uid):
     user_dict = dict()
     query_body = {"query":{"bool":{"must":[{"term":{"uid":uid}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
-    
-    if es.search(index=USER_INFORMATION, doc_type="text",body=query_body)["hits"]["hits"] != []:
-        es_result = es.search(index=USER_INFORMATION, doc_type="text",body=query_body)["hits"]["hits"][0]["_source"]
+    result = es.search(index=USER_INFORMATION, doc_type="text",body=query_body)["hits"]["hits"]
+    if result != []:
+        # try:
+        es_result = result[0]["_source"]
+        # except:
+        #     print(uid)
     else:
         return {uid:{"verified_type":"other","fans_num":0,"username":"","description":"","verified_type":999,"statusnum":0,\
                 "user_location":""}}
@@ -425,10 +428,21 @@ def get_user(uid):
     user_dict = dict()
     information_dict = dict()
 
-    information_dict["user_location"] = es_result["user_location"]
-    information_dict["fans_num"] = es_result["fans_num"]
-    information_dict["username"] = es_result["username"]
-    information_dict["description"] = es_result["description"]
+    for field in ["user_location","fans_num","username","description"]:
+        try:
+            information_dict[field] = es_result[field]
+            
+        except:
+            if field != "fans_num":
+                information_dict[field] = ""
+            else:
+                information_dict[field] = 0
+
+        # information_dict["user_location"] = es_result["user_location"]
+        # information_dict["fans_num"] = es_result["fans_num"]
+        # information_dict["username"] = es_result["username"]
+        # information_dict["description"] = es_result["description"]
+
 
     try:
         information_dict["verified_type"] = es.search(index="weibo_user", doc_type="text",body=query_body)["hits"]["hits"][0]["_source"]["verified_type"]
@@ -545,7 +559,20 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "main_domain" : r_domain,
             "has_new_information":1
                     } })
+            id_body2 = {
+            "query":{
+                "ids":{
+                    "type":"text",
+                    "values":[
+                        str(uid)
+                    ]
+                }
+            }
+        }
+            # if es.search(index=USER_INFORMATION,doc_type='text', body=id_body2)["hits"]["hits"] != []:
             es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":r_domain}})
+            # else:
+            #     es.index(index=USER_INFORMATION,doc_type='text', id=str(uid),body = {"domain":r_domain,"uid":uid})
            
         else:
             es.index(index=USER_DOMAIN_TOPIC, doc_type='text', id=str(uid)+"_"+str(timestamp), body = {
@@ -576,8 +603,9 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "topic_religion":0,
             "topic_social_security":0
                     } )
-            es.index(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"timestamp":timestamp,
-            "uid":uid,"domain":r_domain})
+            es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":r_domain}})
+            # es.index(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"timestamp":timestamp,
+            # "uid":uid,"domain":r_domain})
            
     else:
         if es.search(index=USER_DOMAIN_TOPIC, doc_type='text', body= id_body)["hits"]["hits"] != []:
@@ -589,7 +617,21 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "main_domain" : "other",
             "has_new_information":0
                     } })
+            id_body2 = {
+            "query":{
+                "ids":{
+                    "type":"text",
+                    "values":[
+                        str(uid)
+                    ]
+                }
+            }
+        }
+            # if es.search(index=USER_INFORMATION,doc_type='text', body=id_body2)["hits"]["hits"] != []:
             es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":"other"}})
+            # else:
+            #     es.index(index=USER_INFORMATION,doc_type='text', id=str(uid),body = {"domain":"other","uid":uid})
+            # es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":"other"}})
           
         else:
             es.index(index=USER_DOMAIN_TOPIC, doc_type='text', id=str(uid)+"_"+str(timestamp), body = {
@@ -620,8 +662,8 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "topic_religion":0,
             "topic_social_security":0
                     } )
-            es.index(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {\
-            "uid":uid,"domain":"other"})
+            es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc"{\
+            "uid":uid,"domain":"other"}})
             
 
 def get_user_domain(uid,start_date,end_date):
