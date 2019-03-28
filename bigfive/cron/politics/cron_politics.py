@@ -9,6 +9,9 @@ from retreet_comment import weibo_retweet_comment
 
 from get_keywords import text_rank_keywords
 
+from politics_user import get_politics_user
+from politics_topic import get_politics_topic
+
 from config import *
 from time_utils import *
 from global_utils import *
@@ -126,9 +129,10 @@ def politics_create(politics_mapping_name, keywords, start_date, end_date):
     return uid_list
 
 
-#
+# 给定政策事件，计算其正向负向文本，对正负向文本分出大V和普通用户，再对每种用户进行主题模型聚类
 def politics_portrait(politics_id, politics_mapping_name, user_list, start_date, end_date):
-    pass
+    get_politics_user("ceshizhengceer_1553060528","politics_ceshizhengceer_1553060528")
+
 
 if __name__ == "__main__":
 	politics_create()
