@@ -124,8 +124,8 @@ def save_topic(topic_keyword_dict,topic_doc_dict,politics_id,user_type,sentiment
     }
     es.index(index="politics_topic" ,doc_type="text" ,id=politics_id+"_"+sentiment+"_"+user_type,body=query_body )
 
-def get_politics_topic(index_name,politics_id):
-    mid_dict = get_politics_user(politics_id,index_name)
+def get_politics_topic(politics_id, politic_mapping_name, mid_dict):
+    # mid_dict = get_politics_user(politics_id,politic_mapping_name)
 
     for i in mid_dict:
         sentiment = i
@@ -140,7 +140,7 @@ def get_politics_topic(index_name,politics_id):
             if mid_list==[]:
                 save_topic({},{},politics_id,user_type,sentiment)
             else:
-                weibo_filename,mid_final_list = get_weibo(mid_list,index_name)
+                weibo_filename,mid_final_list = get_weibo(mid_list,politic_mapping_name)
                 get_topic_from_weibo(weibo_filename,topic_num,iteration_num,keywords_num)
                 topic_keyword_dict,topic_doc_dict = get_topic_result(mid_final_list,topic_num,keywords_num)
                 

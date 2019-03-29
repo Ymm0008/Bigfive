@@ -131,8 +131,11 @@ def politics_create(politics_mapping_name, keywords, start_date, end_date):
 
 # 给定政策事件，计算其正向负向文本，对正负向文本分出大V和普通用户，再对每种用户进行主题模型聚类
 def politics_portrait(politics_id, politics_mapping_name, user_list, start_date, end_date):
-    get_politics_user("ceshizhengceer_1553060528","politics_ceshizhengceer_1553060528")
+    print('Start politics user...')  
+    mid_dict = get_politics_user(politics_id, politics_mapping_name, user_list)
 
+    print('Start politics topic...') 
+    get_politics_topic("politics_ceshizhengceer_1553060528","ceshizhengceer_1553060528")
 
 if __name__ == "__main__":
 	politics_create()
