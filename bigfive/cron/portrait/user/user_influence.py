@@ -30,7 +30,7 @@ def cal_importance(domain, topic_list, user_fansnum, fansnum_max):
     result = 0
     domain_result = 0
     domain_result = DOMAIN_WEIGHT_DICT[domain]
-    print (domain_result)
+    # print (domain_result)
     topic_result = 0
     try :
         for topic in topic_list:
@@ -497,7 +497,7 @@ def createWordTree():
         temp = wordTree
         for a in range(0,len(word)):
             index = ord(word[a])
-            print(index)
+            # print(index)
             if a < (len(word) - 1):
                 if temp[index] == None:
                     node = [[None for x in range(65536)],0]
@@ -520,8 +520,8 @@ def searchWord(text, nodeTree):#分词
     words = []
     word = []
     a = 0
-    print(text)
-    print(len(text))
+    # print(text)
+    # print(len(text))
     
     while a < len(text):
         index = ord(text[a])
@@ -546,13 +546,13 @@ def searchWord(text, nodeTree):#分词
         a = a + 1
     
     map_words = {}
-    print(words)
+    # print(words)
 
     for w in words:
-        for x in w:
-            print(chr(x))
+        # for x in w:
+            # print(chr(x))
         iter_word = "".join([chr(x) for x in w])
-        print(iter_word)
+        # print(iter_word)
         if not map_words.__contains__(iter_word):
             map_words[iter_word] = 1
         else:
