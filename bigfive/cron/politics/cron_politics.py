@@ -135,7 +135,7 @@ def politics_portrait(politics_id, politics_mapping_name, user_list, start_date,
     mid_dict = get_politics_user(politics_id, politics_mapping_name, user_list)
 
     print('Start politics topic...') 
-    get_politics_topic("politics_ceshizhengceer_1553060528","ceshizhengceer_1553060528")
+    get_politics_topic(politics_id, politics_mapping_name, mid_dict)
 
 if __name__ == "__main__":
 	politics_create()

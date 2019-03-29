@@ -87,11 +87,13 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
     
     for user,uid_list in uid_user.items():#一个遍历一个类型
         #print(type(uid_list))
-        #print(user,uid_list)
+        # print(user,uid_list)
         personality_dict = {}
         if len(uid_list):
             personality_result = es.mget(index=USER_RANKING,doc_type="text",body = {"ids":uid_list} )['docs']
             for user_item in personality_result:
+                if not user_item['found']:
+                    continue
                 for personality_label in personality_label_list:
                     if personality_label not in personality_dict:
                         personality_dict[personality_label] = {"low":0,"high":0}#字典初始化
@@ -122,7 +124,7 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
             es_dict["user_type"] = "ordinary"
         es_dict = dict(es_dict,**personality_dict)
         id_es = politics_id + "_"+sentiment +"_"+ user_type
-        print(es_dict)
+        print(user)
         es.index(index ="politics_personality",doc_type = "text",id = id_es,body = es_dict)
     return mid_user
             
