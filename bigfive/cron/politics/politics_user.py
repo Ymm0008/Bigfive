@@ -57,17 +57,18 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
             #print(len(es_result))
             #print(es_result[0])
             for item in es_result:
-                if item["_source"]["sentiment"] != 0:
-                    if item["_source"]["sentiment"] == 1: #积极用户
-                        if item["_source"]["user_fansnum"] >= 100000:
-                            mid_user["positive"]["bigv_user"].append(item["_id"])
-                            if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["p_bigv_user"]:
-                                uid_user["p_bigv_user"].append(item["_source"]["uid"])
-                        else:
-                            mid_user["positive"]["ordinary_user"].append(item["_id"])
-                            if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["p_ordinary_user"]:
-                                uid_user["p_ordinary_user"].append(item["_source"]["uid"])
-                    else:#消极用户
+                if item["_source"]["sentiment"] == "1": #积极用户
+                    if item["_source"]["user_fansnum"] >= 100000:
+                        #print(type(item["_source"]["user_fansnum"]))
+                        mid_user["positive"]["bigv_user"].append(item["_id"])
+                        if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["p_bigv_user"]:
+                            uid_user["p_bigv_user"].append(item["_source"]["uid"])
+                    else:
+                        mid_user["positive"]["ordinary_user"].append(item["_id"])
+                        if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["p_ordinary_user"]:
+                            uid_user["p_ordinary_user"].append(item["_source"]["uid"])
+                else:#消极用户
+                    if item["_source"]["sentiment"] > "1":
                         if item["_source"]["user_fansnum"] >= 100000:
                             mid_user["negative"]["bigv_user"].append(item["_id"])
                             if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["n_bigv_user"]:
@@ -76,12 +77,9 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
                             mid_user["negative"]["ordinary_user"].append(item["_id"])
                             if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["n_ordinary_user"]:
                                 uid_user["n_ordinary_user"].append(item["_source"]["uid"])
-                else:
-                    pass
         except StopIteration:
             #遇到StopIteration就退出循环
             break
-    #print(mid_user)
     
     
     
@@ -124,8 +122,9 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
             es_dict["user_type"] = "ordinary"
         es_dict = dict(es_dict,**personality_dict)
         id_es = politics_id + "_"+sentiment +"_"+ user_type
-        print(user)
+        #print(user)
         es.index(index ="politics_personality",doc_type = "text",id = id_es,body = es_dict)
+    
     return mid_user
             
 
@@ -134,13 +133,11 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
 if __name__ == "__main__":
     
     s_t = time.time()
-    get_politics_user("ceshizhengceyi_1552983497","politics_ceshizhengceyi_1552983497")
+    uidlist = get_user_ranking()
+    get_politics_user("ceshizhengceyi_1552983497","politics_ceshizhengceyi_1552983497",uidlist)
     e_t = time.time()
     print ("time",e_t - s_t)
-    s_t1 = time.time()
-    get_politics_user("ceshizhengceer_1553060528","politics_ceshizhengceer_1553060528")
-    e_t1 = time.time()
-    print ("time",e_t1 - s_t1)
+    
     
     pass
 
