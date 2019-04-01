@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import operator
+import re
 import sys
 
 sys.path.append('../../')
@@ -17,9 +18,16 @@ keywords_num = 20
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_weibo(mid_list,index_name):
+def get_weibo(mid_list,politics_id,index_name):
+    for f in os.listdir(os.path.join(ABS_PATH, 'LDA')):
+        if f in ["model.tdocs","model.twords"] or re.search(r".data.txt",f):
+            f = os.path.join(os.path.join(ABS_PATH, 'LDA'), f )
+            if os.path.isfile(f):
+                os.remove(f)
+
     mid_final_list = []
-    with open(os.path.join(ABS_PATH, 'LDA/weibo_data.txt' ),"w") as f:
+    filename = politics_id+".data.txt"
+    with open(os.path.join(ABS_PATH, 'LDA/'+filename ),"w") as f:
         for mid in mid_list:
             text = es.search(index=index_name ,doc_type="text",\
                         body={"query":{"bool":{"must":[{"term":{"mid":mid}}]}}} )["hits"]["hits"][0]["_source"]["text"]            
@@ -27,13 +35,9 @@ def get_weibo(mid_list,index_name):
             f.write("\n")
             mid_final_list.append(mid) 
 
-    return "weibo_data.txt",mid_final_list
+    return filename,mid_final_list
 
 def get_topic_from_weibo(weibo_filename,topic_num,iteration_num,keywords_num):
-    for f in ["LDA/weibo_data.txt.preprocessed","LDA/model.tdocs","LDA/model.twords"]:
-        f = os.path.join(ABS_PATH, f )
-        if os.path.isfile(f):
-            os.remove(f)
 
     command = "cd "+os.path.join(ABS_PATH, 'LDA')+"; java -jar LDA.jar ./"+weibo_filename+" "+str(topic_num)+" "+str(iteration_num)+" "+str(keywords_num)
 
@@ -140,7 +144,7 @@ def get_politics_topic(politics_id, politics_mapping_name, mid_dict):
             if mid_list==[]:
                 save_topic({},{},politics_id,user_type,sentiment)
             else:
-                weibo_filename,mid_final_list = get_weibo(mid_list,politics_mapping_name)
+                weibo_filename,mid_final_list = get_weibo(mid_list,politics_id,politics_mapping_name)
                 get_topic_from_weibo(weibo_filename,topic_num,iteration_num,keywords_num)
                 topic_keyword_dict,topic_doc_dict = get_topic_result(mid_final_list,topic_num,keywords_num)
                 
