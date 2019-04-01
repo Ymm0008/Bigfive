@@ -29,7 +29,7 @@ def get_event_sentiment(event_id, event_mapping_name, start_date, end_date):
         geo_dict = {}
         message_type_dict = {}
 
-        sort_dict = {'_id':{'order':'asc'}}    
+        sort_dict = {'_uid':{'order':'asc'}}    
         query_body = {
             'query':{
                 'bool':{
