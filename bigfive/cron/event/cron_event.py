@@ -12,7 +12,7 @@ from event_cal_network import get_event_userlist_important
 from event_cal_emotion import get_event_sentiment
 from event_personality import get_event_personality
 
-from get_keywords import text_rank_keywords
+from cron_utils import text_rank_keywords, triple_classifier, from_ip_get_info
 from event_river.river_main import river_main
 
 from config import *
@@ -50,8 +50,8 @@ def event_create(event_mapping_name, keywords, start_date, end_date):
                 source = hit['_source']
                 ###计算需要在取出事件相关微博数据的时候计算的指标
                 keywords_string = '&'.join(text_rank_keywords(source['text']))
-                sentiment = source['sentiment']
-                geo = source['geo']
+                sentiment = triple_classifier(source)
+                geo = from_ip_get_info(source['ip'])
 
                 dic = {
                     'root_uid':source['root_uid'],

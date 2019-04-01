@@ -5,7 +5,7 @@ import re
 import sys
 sys.path.append('../../')
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
-from get_keywords import text_rank_keywords
+from cron_utils import text_rank_keywords
 
 # micro_words
 def micro_words(text):

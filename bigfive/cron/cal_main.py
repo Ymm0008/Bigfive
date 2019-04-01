@@ -184,7 +184,7 @@ if __name__ == '__main__':
     #         username_list.append(hit['_source']['username'])
     #     user_ranking(uid_list, username_list, '2016-11-27')
 
-    es.update(index='politics_information',doc_type='text',id='ceshizhengcesan_1553839650',body={'doc':{'progress':2}})
+    es.update(index='politics_information',doc_type='text',id='ceshizhengcesi_1554101331',body={'doc':{'progress':0}})
 
     # # es.delete(index='event_information',doc_type='text',id='ceshishijianliu_1552978686')
 

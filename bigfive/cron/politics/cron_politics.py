@@ -4,10 +4,11 @@ sys.path.append('../')
 sys.path.append('../../')
 
 from elasticsearch.helpers import bulk
+from multiprocessing import Pool
 
 from retreet_comment import weibo_retweet_comment
 
-from get_keywords import text_rank_keywords
+from cron_utils import text_rank_keywords, triple_classifier, from_ip_get_info
 
 from politics_user import get_politics_user
 from politics_topic import get_politics_topic
@@ -47,8 +48,8 @@ def politics_create(politics_mapping_name, keywords, start_date, end_date):
                 source = hit['_source']
                 ###计算需要在取出事件相关微博数据的时候计算的指标
                 keywords_string = '&'.join(text_rank_keywords(source['text']))
-                sentiment = source['sentiment']
-                geo = source['geo']
+                sentiment = triple_classifier(source)
+                geo = from_ip_get_info(source['ip'])
 
                 dic = {
                     'root_uid':source['root_uid'],
