@@ -13,7 +13,7 @@ from global_utils import *
 
 def get_user_ranking():
     query_body = {"query": {"bool": {"must": [{"match_all": { }}]}}}
-    sort_dict = {"_id":{"order":"asc"}}
+    sort_dict = {"_uid":{"order":"asc"}}
     ESIterator2 = ESIterator(0,sort_dict,1000,USER_RANKING,"text",query_body,es)
     uidlist = []
     while True:
