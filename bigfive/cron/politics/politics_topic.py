@@ -59,11 +59,14 @@ def get_topic_from_weibo(weibo_filename,topic_num,iteration_num,keywords_num):
             break
         else:
             time.sleep(1)
+    time.sleep(0.5)
 
 
 def get_topic_result(mid_list,topic_num,keywords_num):
     topic_keyword_dict = {}
     topic_doc_dict = {}
+    twords_num = 0
+    tdocs_num = 0
 
     with open(os.path.join(ABS_PATH, 'LDA/model.twords' )) as f_words:    
         content = iter(f_words.readlines())
@@ -83,6 +86,7 @@ def get_topic_result(mid_list,topic_num,keywords_num):
                         keyword_dict[keyword] = float(value)
 
                     topic_keyword_dict[topic_name] = keyword_dict
+                twords_num += 1
             except:
                 break
     if os.path.isfile(os.path.join(ABS_PATH, 'LDA/model.twords' )):
@@ -108,11 +112,16 @@ def get_topic_result(mid_list,topic_num,keywords_num):
                         doc_list.append({"content":doc,"mid":mid_list[doc_num]})
 
                     topic_doc_dict[topic_name] = doc_list
+                tdocs_num += 1
             except:
                 break
     if os.path.isfile(os.path.join(ABS_PATH, 'LDA/model.tdocs' )):
         os.remove(os.path.join(ABS_PATH, 'LDA/model.tdocs' ))
 
+    # if twords_num and tdocs_num:   #一旦主题模型出错导致一个文件没有结果，直接存空
+    #     return topic_keyword_dict,topic_doc_dict
+    # else:
+    #     return {},{}
     return topic_keyword_dict,topic_doc_dict
 
 

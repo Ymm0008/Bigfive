@@ -30,7 +30,7 @@ def get_user_ranking():
 
 def get_politics_user(politics_id, politic_mapping_name, uidlist):
     # uidlist = get_user_ranking()
-    sort_dict = {"_id":{"order":"asc"}}
+    sort_dict = {"_uid":{"order":"asc"}}
     query_body = {
         "query":{
             "bool":{
