@@ -33,7 +33,7 @@ def get_weibo_generator(weibo_index, query_body, iter_num_per):
     total = -1
     while (iter_get_weibo == iter_num_per):
         print("weibo_iter_num: %d, total: %d" % (iter_num*iter_num_per, total))
-        query_body['sort'] = {'_id':{'order':'asc'}}
+        query_body['sort'] = {'_uid':{'order':'asc'}}
         query_body['size'] = iter_num_per
         query_body['from'] = iter_num * iter_num_per
         es_result = es_weibo.search(index=weibo_index,doc_type='text',body=query_body)
@@ -55,7 +55,7 @@ def get_event_weibo_generator(weibo_index, query_body, iter_num_per):
     total = -1
     while (iter_get_weibo == iter_num_per):
         print("weibo_iter_num: %d, total: %d" % (iter_num*iter_num_per, total))
-        query_body['sort'] = {'_id':{'order':'asc'}}
+        query_body['sort'] = {'_uid':{'order':'asc'}}
         query_body['size'] = iter_num_per
         query_body['from'] = iter_num * iter_num_per
         es_result = es.search(index=weibo_index,doc_type='text',body=query_body)

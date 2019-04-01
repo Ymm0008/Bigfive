@@ -25,7 +25,7 @@ def get_user_list(event_name):
                 }
             },
             'sort':{
-                '_id':{
+                '_uid':{
                     'order':'asc'
                 }
             },

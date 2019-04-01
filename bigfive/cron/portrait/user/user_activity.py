@@ -25,7 +25,7 @@ def get_uid_weibo(uid, start_date,end_date):
         weibo_data_dict[day] = []
         index_name = "flow_text_" + str(day)
         query_body ={"query": {"bool": {"must":[{"term": {"uid": uid}}]}}}
-        sort_dict = {'_id':{'order':'asc'}}
+        sort_dict = {'_uid':{'order':'asc'}}
         ESIterator1 = ESIterator(0,sort_dict,1000,index_name,"text",query_body,es_weibo)
         while True:
             try:
