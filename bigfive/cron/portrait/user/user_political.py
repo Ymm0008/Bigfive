@@ -57,7 +57,7 @@ def get_uid_weibo(uid,index_name):
     for index_item in index_name:
 
         query_body ={"query": {"bool": {"must":[{"term": {"uid": uid}}]}}}
-        sort_dict = {'_id':{'order':'asc'}}
+        sort_dict = {'_uid':{'order':'asc'}}
         try:
             ESIterator1 = ESIterator(0,sort_dict,1000,index_item,"text",query_body,es_weibo)
             while True:
