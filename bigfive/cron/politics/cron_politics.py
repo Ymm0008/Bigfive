@@ -32,7 +32,7 @@ def politics_create(politics_mapping_name, keywords, start_date, end_date):
             }
         }
     }
-
+    
     date_list = get_datelist_v2(start_date, end_date)
     ###迭代日期进行模糊搜索并将微博存到一个新的事件索引中去
     for date in date_list:

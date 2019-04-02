@@ -33,9 +33,9 @@ def from_ip_get_info(sip):
             city = ''
 
         # subdivisions = response.subdivisions.most_specific.names.get(u'zh-CN', "")
+        return country+"&"+subdivisions+"&"+city
     except Exception as ex:
         return u'其他'
-    return country+"&"+subdivisions+"&"+city
 
 #汇总用户IP频次
 def get_recent_ip(uid,index_list,date): #n_days,

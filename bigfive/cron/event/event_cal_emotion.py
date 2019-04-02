@@ -83,20 +83,20 @@ def get_event_sentiment(event_id, event_mapping_name, start_date, end_date):
         # print (sentiment_dict)#一天的数据的统计信息
         # print (sentiment_geo_dict)
         for i in range(0,7):
-            if str(i) not in sentiment_dict:
-                sentiment_dict[str(i)] = 0
-            if str(i) not in sentiment_geo_dict:
-                sentiment_geo_dict[str(i)] = {}
+            if i not in sentiment_dict:
+                sentiment_dict[i] = 0
+            if i not in sentiment_geo_dict:
+                sentiment_geo_dict[i] = {}
         base_dict = {"timestamp":date2ts(date),"date":date,"event_id":event_id}
         # print(sentiment_dict)
         new_sentiment_dict = {}
-        new_sentiment_dict["nuetral"] = sentiment_dict["0"]
-        new_sentiment_dict["positive"] = sentiment_dict["1"]
-        new_sentiment_dict["angry"] = sentiment_dict["2"]
-        new_sentiment_dict["anxiety"] = sentiment_dict["3"]
-        new_sentiment_dict["sad"] = sentiment_dict["4"]
-        new_sentiment_dict["hate"] = sentiment_dict["5"]
-        new_sentiment_dict["negtive"] = sentiment_dict["6"]
+        new_sentiment_dict["nuetral"] = sentiment_dict[0]
+        new_sentiment_dict["positive"] = sentiment_dict[1]
+        new_sentiment_dict["angry"] = sentiment_dict[2]
+        new_sentiment_dict["anxiety"] = sentiment_dict[3]
+        new_sentiment_dict["sad"] = sentiment_dict[4]
+        new_sentiment_dict["hate"] = sentiment_dict[5]
+        new_sentiment_dict["negtive"] = sentiment_dict[6]
         # print(new_sentiment_dict)
         body_dict = dict(new_sentiment_dict,**base_dict)
         # print(body_dict)
