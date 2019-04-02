@@ -3,6 +3,7 @@ sys.path.append('../')
 from config import *
 from time_utils import *
 from cal_main import user_main
+from cron.portrait.user.normalizing import normalize_influence_index
 
 def main():
 	query_body = {
@@ -26,10 +27,12 @@ def main():
 		username_list.append(hit['_source']['username'])
 	start_date = '2016-11-13'
 	end_date = '2016-11-27'
+	day = 15   #从start_date到end_date的天数
 	if len(uid_list):
 		for uid in uid_list:
 			es.update(index=USER_INFORMATION,doc_type='text',body={'doc':{'progress':1}},id=uid)   #计算开始，计算状态变为计算中
 		user_main(uid_list, username_list, start_date, end_date)
+		normalize_influence_index(start_date, end_date,day)  #计算完当日全部入库用户后 对四个指标值进行归一化
 		for uid in uid_list:
 			es.update(index=USER_INFORMATION,doc_type='text',body={'doc':{'progress':2}},id=uid)   #计算结束，计算状态变为计算完成
 

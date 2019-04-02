@@ -31,8 +31,7 @@ def create_politics_mapping(index_name):
                         "type": "string"
                     },
                     "sentiment": {
-                        "index": "not_analyzed",
-                        "type": "string"
+                        "type": "long"
                     },
                     "ip": {
                         "index": "not_analyzed",

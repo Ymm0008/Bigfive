@@ -1,3 +1,8 @@
+import sys
+sys.path.append('portrait/user')
+from portrait.user.sentiment_classification.triple_sentiment_classifier import triple_classifier
+from portrait.user.user_ip import from_ip_get_info
+
 from textrank4zh import TextRank4Keyword, TextRank4Sentence
 
 # key_words
@@ -11,4 +16,8 @@ def text_rank_keywords(text, keywords_num=5):
     return keywords
 
 if __name__ == "__main__":
-    text_rank_keywords("今天是个好日子，心想的事儿都能成！", 5)
+    # text_rank_keywords("今天是个好日子，心想的事儿都能成！", 5)
+    # tweet = {'text': '还是要+点肉//@爱心china桃:没肉不好吃～'}
+    # domain = triple_classifier(tweet)
+    # print(domain)
+    print(from_ip_get_info('172.16.181.112'))

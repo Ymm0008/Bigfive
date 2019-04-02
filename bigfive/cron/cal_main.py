@@ -85,12 +85,12 @@ def event_main(keywords, event_id, start_date, end_date):
 def politics_main(keywords, politics_id, start_date, end_date):
     print('Start creating politics...')
     politics_mapping_name = 'politics_%s' % politics_id
-    create_politics_mapping(politics_mapping_name)
-    userlist = politics_create(politics_mapping_name, keywords, start_date, end_date)
-    es.update(index=POLITICS_INFORMATION,doc_type='text',body={'doc':{'userlist':userlist}},id=politics_id)
+    # create_politics_mapping(politics_mapping_name)
+    # userlist = politics_create(politics_mapping_name, keywords, start_date, end_date)
+    # es.update(index=POLITICS_INFORMATION,doc_type='text',body={'doc':{'userlist':userlist}},id=politics_id)
     
     print('Start politics portrait...')
-    # userlist = es.get(index='politics_information',doc_type='text',id=politics_id)['_source']['userlist']
+    userlist = es.get(index='politics_information',doc_type='text',id=politics_id)['_source']['userlist']
     politics_portrait(politics_id, politics_mapping_name, userlist, start_date, end_date)
 
     print('Successfully create politics...')
@@ -98,7 +98,7 @@ def politics_main(keywords, politics_id, start_date, end_date):
 
 
 if __name__ == '__main__':
-    user_main(['1978574705','2596620224'],['闱闱祯祯','时尚女生爱购物'],'2016-11-13','2016-11-27')
+    # user_main(['1978574705','2596620224'],['闱闱祯祯','时尚女生爱购物'],'2016-11-13','2016-11-27')
     # group_main(1,2,3,4,5)
 
     # event_name = "测试事件二"
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     #         username_list.append(hit['_source']['username'])
     #     user_ranking(uid_list, username_list, '2016-11-27')
 
-    # es.update(index='group_task',doc_type='text',id='ceshijiu_1553067916',body={'doc':{'progress':0}})
+    es.update(index='politics_information',doc_type='text',id='ceshizhengcesi_1554101331',body={'doc':{'progress':0}})
 
     # # es.delete(index='event_information',doc_type='text',id='ceshishijianliu_1552978686')
 

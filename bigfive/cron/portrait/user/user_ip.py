@@ -11,10 +11,11 @@ sys.path.append('../../../')
 from config import *
 from time_utils import *
 
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 #IP映射到 国家-省份-城市
 def from_ip_get_info(sip):
-    reader = geoip2.database.Reader('GeoLite2-City/GeoLite2-City.mmdb')
+    reader = geoip2.database.Reader(os.path.join(ABS_PATH,'GeoLite2-City/GeoLite2-City.mmdb'))
     try:
         response = reader.city(sip)
         try:
