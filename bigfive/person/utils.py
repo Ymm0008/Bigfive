@@ -658,11 +658,12 @@ def get_preference_identity(uid):
         if k.startswith('topic_'):
             preference_item[k] = v
     l = sorted(preference_item.items(), key=lambda x:x[1], reverse=True)[0:5]
-    topic_result[topic_dict[l[0][0].replace('topic_', '')]] = l[0][1]
-    topic_result[topic_dict[l[1][0].replace('topic_', '')]] = l[1][1]
-    topic_result[topic_dict[l[2][0].replace('topic_', '')]] = l[2][1]
-    topic_result[topic_dict[l[3][0].replace('topic_', '')]] = l[3][1]
-    topic_result[topic_dict[l[4][0].replace('topic_', '')]] = l[4][1]
+    sum_topic = sum(l.values())
+    topic_result[topic_dict[l[0][0].replace('topic_', '')]] = l[0][1]/sum_topic
+    topic_result[topic_dict[l[1][0].replace('topic_', '')]] = l[1][1]/sum_topic
+    topic_result[topic_dict[l[2][0].replace('topic_', '')]] = l[2][1]/sum_topic
+    topic_result[topic_dict[l[3][0].replace('topic_', '')]] = l[3][1]/sum_topic
+    topic_result[topic_dict[l[4][0].replace('topic_', '')]] = l[4][1]/sum_topic
 
     node_main = {'name': labels_dict[preference_and_topic_data['main_domain']], 'id': preference_and_topic_data['uid']}
     node_followers = {'name': labels_dict[preference_and_topic_data['domain_followers']]}
