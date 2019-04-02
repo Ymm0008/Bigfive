@@ -657,7 +657,7 @@ def get_preference_identity(uid):
     for k, v in preference_and_topic_data.items():
         if k.startswith('topic_'):
             preference_item[k] = v
-    l = sorted(preference_item.items(), key=lambda x:x[1], reverse=True)
+    l = sorted(preference_item.items(), key=lambda x:x[1], reverse=True)[0:5]
     sum_topic = sum([i[1] for i in l])
     for i in range(0,5):
         topic_result[topic_dict[l[i][0].replace('topic_', '')]] = l[i][1]/sum_topic
