@@ -11,7 +11,7 @@ def get_user_generator(user_index, query_body, iter_num_per):
     total = -1
     while (iter_get_user == iter_num_per):
         print("user_iter_num: %d, total: %d" % (iter_num*iter_num_per, total))
-        query_body['sort'] = {'uid':{'order':'asc'}}
+        query_body['sort'] = {'_uid':{'order':'asc'}}
         query_body['size'] = iter_num_per
         query_body['from'] = iter_num * iter_num_per
         es_result = es.search(index=user_index,doc_type='text',body=query_body)

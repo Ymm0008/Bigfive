@@ -118,11 +118,11 @@ def get_topic_result(mid_list,topic_num,keywords_num):
     if os.path.isfile(os.path.join(ABS_PATH, 'LDA/model.tdocs' )):
         os.remove(os.path.join(ABS_PATH, 'LDA/model.tdocs' ))
 
-    # if twords_num and tdocs_num:   #一旦主题模型出错导致一个文件没有结果，直接存空
-    #     return topic_keyword_dict,topic_doc_dict
-    # else:
-    #     return {},{}
-    return topic_keyword_dict,topic_doc_dict
+    if twords_num and tdocs_num:   #一旦主题模型出错导致一个文件没有结果，直接存空
+        return topic_keyword_dict,topic_doc_dict
+    else:
+        return {},{}
+    # return topic_keyword_dict,topic_doc_dict
 
 
 def save_topic(topic_keyword_dict,topic_doc_dict,politics_id,user_type,sentiment):
