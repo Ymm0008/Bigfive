@@ -17,7 +17,7 @@ def get_hot_event_list(keyword, page, size, order_name, order_type):
     order_name = 'event_name' if order_name == 'name' else order_name
     order_name = order_name if order_name else 'event_name'
     order_type = order_type if order_type else 'asc'
-    query['sort'] += [{order_name: {"order": order_type}}]
+    query['sort'] = [{order_name: {"order": order_type}}]
     query['from'] = str((int(page) - 1) * int(size))
     query['size'] = str(size)
     if keyword:
