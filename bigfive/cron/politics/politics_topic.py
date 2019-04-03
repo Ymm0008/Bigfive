@@ -49,7 +49,7 @@ def get_topic_from_weibo(weibo_filename,topic_num,iteration_num,keywords_num):
     p_object = os.popen(command)
 
     while True:
-        if os.path.exists(os.path.join(ABS_PATH, 'LDA/model.twords')):
+        if os.path.exists(os.path.join(ABS_PATH, 'LDA/model.twords')) or os.path.exists(os.path.join(ABS_PATH, 'LDA/model.tdocs')):
             if os.path.isfile(os.path.join(ABS_PATH, 'LDA/%s' % weibo_filename)):
                 os.remove(os.path.join(ABS_PATH, 'LDA/%s' % weibo_filename))
             if os.path.isfile(os.path.join(ABS_PATH, 'LDA/%s.preprocessed' % weibo_filename)):
@@ -67,6 +67,13 @@ def get_topic_result(mid_list,topic_num,keywords_num):
     topic_doc_dict = {}
     twords_num = 0
     tdocs_num = 0
+
+    if not (os.path.exists(os.path.join(ABS_PATH, 'LDA/model.twords')) & os.path.exists(os.path.join(ABS_PATH, 'LDA/model.tdocs'))):
+        if os.path.isfile(os.path.join(ABS_PATH, 'LDA/model.twords' )):
+            os.remove(os.path.join(ABS_PATH, 'LDA/model.twords' ))
+        if os.path.isfile(os.path.join(ABS_PATH, 'LDA/model.tdocs' )):
+            os.remove(os.path.join(ABS_PATH, 'LDA/model.tdocs' ))
+        return {}, {}
 
     with open(os.path.join(ABS_PATH, 'LDA/model.twords' )) as f_words:    
         content = iter(f_words.readlines())

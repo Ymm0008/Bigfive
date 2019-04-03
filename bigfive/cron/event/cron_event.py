@@ -25,7 +25,7 @@ from global_utils import *
 def event_create(event_mapping_name, keywords, start_date, end_date):
     uid_list_keyword = []
     keyword_list = keywords.split('&')
-    keyword_query_list = [{"wildcard":{"text":"*%s*" % keyword}} for keyword in keyword_list]
+    keyword_query_list = [{"match_phrase":{"text":keyword}} for keyword in keyword_list]
     weibo_query_body = {
         "query":{
             'bool':{
@@ -78,7 +78,10 @@ def event_create(event_mapping_name, keywords, start_date, end_date):
 
                 if weibo_num % 1000 == 0:
                     #获取用户昵称
-                    username_results = es.mget(index='weibo_user', doc_type='type1', body={'ids':uid_list})['docs']
+                    if len(uid_list):
+                        username_results = es.mget(index='weibo_user', doc_type='type1', body={'ids':uid_list})['docs']
+                    else:
+                        username_results = []
                     username_dic = {}
                     for item in username_results:
                         if item['found']:
@@ -103,7 +106,10 @@ def event_create(event_mapping_name, keywords, start_date, end_date):
                 uid_list_keyword.append(source['uid'])
 
         #存入剩下的数据
-        username_results = es.mget(index='weibo_user', doc_type='type1', body={'ids':uid_list})['docs']
+        if len(uid_list):
+            username_results = es.mget(index='weibo_user', doc_type='type1', body={'ids':uid_list})['docs']
+        else:
+            username_results = []
         username_dic = {}
         for item in username_results:
             if item['found']:
@@ -124,7 +130,10 @@ def event_create(event_mapping_name, keywords, start_date, end_date):
     uid_list = []
     while (iter_num*USER_WEIBO_ITER_COUNT <= len(uid_list_keyword)):
         iter_uid_list_keyword = uid_list_keyword[iter_num*USER_WEIBO_ITER_COUNT : (iter_num + 1)*USER_WEIBO_ITER_COUNT]
-        iter_user_dict_list = es.mget(index='weibo_user', doc_type='type1', body={'ids':iter_uid_list_keyword})['docs']
+        if len(iter_uid_list_keyword):
+            iter_user_dict_list = es.mget(index='weibo_user', doc_type='type1', body={'ids':iter_uid_list_keyword})['docs']
+        else:
+            iter_user_dict_list = []
         uid_list.extend([i['_id'] for i in iter_user_dict_list if i['found']])
         iter_num += 1
 

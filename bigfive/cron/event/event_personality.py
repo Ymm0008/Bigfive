@@ -57,27 +57,35 @@ def get_event_personality(event_id, event_mapping_name, user_list, start_date, e
     }
     for personality_label in PERSONALITY_LABEL_LIST:
         query_body_low = {
-                    "query":{
+            "query":{
+                "filtered":{
+                    "filter":{
                         "bool":{
                             "must":[
-                                    {"terms":{"uid":user_list}},
-                                    {"term":{personality_label:0}}
-                                    ]
-                                }
-                        },
-                    "size":MAX_VALUE
+                                {"terms":{"uid":user_list}},
+                                {"term":{personality_label:0}}
+                                ]
+                            }
+                        }
+                    }
+                },
+            "size":MAX_VALUE
 
         }
         query_body_high = {
-                    "query":{
+            "query":{
+                "filtered":{
+                    "filter":{
                         "bool":{
                             "must":[
-                                    {"terms":{"uid":user_list}},
-                                    {"term":{personality_label:2}}
-                                    ]
-                                }
-                        } ,
-                    "size":MAX_VALUE
+                                {"terms":{"uid":user_list}},
+                                {"term":{personality_label:2}}
+                                ]
+                            }
+                        }
+                    }
+                } ,
+            "size":MAX_VALUE
         }
 
         es_result_low = es.search(index= USER_RANKING ,doc_type="text",body=query_body_low)["hits"]["hits"]
@@ -87,21 +95,25 @@ def get_event_personality(event_id, event_mapping_name, user_list, start_date, e
         high_user_list = [i["_id"] for i in es_result_high]
 
         event_query_body_high = {
-                    "query":{
+            "query":{
+                "filtered":{
+                    "filter":{
                         "bool":{
                             "must":[
-                                    {"terms":{"uid":high_user_list}},
-                                    {"range": {
-                                        "timestamp": {
-                                            "gte": start_ts,
-                                            "lt": end_ts
-                                                }
+                                {"terms":{"uid":high_user_list}},
+                                {"range": {
+                                    "timestamp": {
+                                        "gte": start_ts,
+                                        "lt": end_ts
                                             }
                                         }
-                                    ]
-                                }
-                        } ,
-                    "aggs":{"sentiment_aggs":{"terms":{"field":"sentiment"}}}
+                                    }
+                                ]
+                            }
+                        } 
+                    }
+                },
+            "aggs":{"sentiment_aggs":{"terms":{"field":"sentiment"}}}
         }
 
         res = es.search(index=event_mapping_name,doc_type="text",body=event_query_body_high)
@@ -117,21 +129,25 @@ def get_event_personality(event_id, event_mapping_name, user_list, start_date, e
 
 
         event_query_body_low = {
-                    "query":{
+            "query":{
+                "filtered":{
+                    "filter":{
                         "bool":{
                             "must":[
-                                    {"terms":{"uid":low_user_list}},
-                                     {"range": {
-                                        "timestamp": {
-                                            "gte": start_ts,
-                                            "lt": end_ts
-                                                }
+                                {"terms":{"uid":low_user_list}},
+                                {"range": {
+                                    "timestamp": {
+                                        "gte": start_ts,
+                                        "lt": end_ts
                                             }
                                         }
-                                    ]
-                                }
-                        } ,
-                    "aggs":{"sentiment_aggs":{"terms":{"field":"sentiment"}}}
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                } ,
+            "aggs":{"sentiment_aggs":{"terms":{"field":"sentiment"}}}
         }
 
         res_2 = es.search(index=event_mapping_name,doc_type="text",body=event_query_body_low)
