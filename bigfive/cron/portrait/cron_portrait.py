@@ -170,7 +170,7 @@ def group_create(args_dict, keywords, remark, group_name, create_time, start_dat
     #如果关键词的不为空的话，则搜索指定日期内包含这些关键词的微博并获取其用户列表
     if keywords != '':
         keyword_list = keywords.split('&')
-        keyword_query_list = [{"wildcard":{"text":"*%s*" % keyword}} for keyword in keyword_list]
+        keyword_query_list = [{"match_phrase":{"text":keyword}} for keyword in keyword_list]
         weibo_query_body = {
             "query":{
                 'bool':{
@@ -232,7 +232,10 @@ def group_create(args_dict, keywords, remark, group_name, create_time, start_dat
         uid_list = []
         while (iter_num*USER_WEIBO_ITER_COUNT <= len(uid_list_keyword)):
             iter_uid_list_keyword = uid_list_keyword[iter_num*USER_WEIBO_ITER_COUNT : (iter_num + 1)*USER_WEIBO_ITER_COUNT]
-            iter_user_dict_list = es.mget(index=USER_INFORMATION, doc_type='text', body={'ids':iter_uid_list_keyword})['docs']
+            if len(iter_uid_list_keyword):
+                iter_user_dict_list = es.mget(index=USER_INFORMATION, doc_type='text', body={'ids':iter_uid_list_keyword})['docs']
+            else:
+                iter_user_dict_list = []
             uid_list.extend([i['_id'] for i in iter_user_dict_list if i['found']])
             iter_num += 1
     if keywords == '':
