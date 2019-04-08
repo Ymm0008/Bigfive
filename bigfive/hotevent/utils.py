@@ -109,7 +109,7 @@ def get_geo(event_id,geo,s, e):
         s = get_before_date(30)
     st = date2ts(s)
     et = date2ts(e)
-    abroad_count = es.search(index='event_'+event_id, doc_type='text', body={'query': {'bool': {'must': [], 'must_not': [{'terms': {'geo': ['中国', '局域网']}}]}}, 'from': 0, 'size': 5000})['hits']['total']
+    abroad_count = es.search(index='event_'+event_id, doc_type='text', body={'query': {'bool': {'must': [], 'must_not': [{'terms': {'geo': ['中国', '局域网']}}]}}, 'from': 0, 'size': 0})['hits']['total']
     query = {"query": {"bool": {"must": [{"wildcard": {"geo": "*{}*".format(geo)}}, {"range": {"timestamp": {"gte": st, "lte": et}}}], "must_not": [], "should": []}}, "from": 0, "size": 100000, "sort": [], "aggs": {}}
     hits = es.search(index='event_'+event_id,
                      doc_type='text', body=query,_source_include=['geo'])['hits']['hits']
@@ -129,7 +129,7 @@ def get_geo(event_id,geo,s, e):
                 continue
         elif len(geo_list) > 2 and geo != '中国':
             # 拿到省名 并过滤掉类似中国&中山 中山是市
-            province = geo_list[1]
+            province = geo_list[1].replace('市','').replace('省','').replace('自治区','')
             if province not in MAP_CITIES_DICT.keys():
                 continue
             # 中国&山西&太原

@@ -18,8 +18,8 @@ def hot_politics_list():
     keyword = parameters.get('keyword', '')
     page = parameters.get('page', '1')
     size = parameters.get('size', '10')
-    order_name = parameters.get('order_name', 'name')
-    order_type = parameters.get('order_type', 'asc')
+    order_name = parameters.get('order_name', 'create_date')
+    order_type = parameters.get('order_type', 'desc')
     result = get_hot_politics_list(keyword, page, size, order_name, order_type)
     return jsonify(result)
 
