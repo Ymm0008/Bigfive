@@ -24,6 +24,7 @@ from event_mapping import create_event_mapping
 from portrait.user.user_text_analyze import cal_user_text_analyze
 from cron_politics import politics_create, politics_portrait
 from politics_mapping import create_politics_mapping
+from portrait.user.normalizing import normalize_influence_index
 
 #对用户进行批量计算，流数据接入时会自动入库批量计算
 def user_main(uid_list, username_list, start_date, end_date):
@@ -37,7 +38,7 @@ def user_main(uid_list, username_list, start_date, end_date):
     for uid in uid_list:
         print(uid)
         user_portrait(uid, start_date ,end_date)
-    
+
     print('Start calculating user ranking...')
     user_ranking(uid_list, username_list, end_date)
 
@@ -58,7 +59,7 @@ def group_main(args_dict, keyword, remark, group_name, create_time):
 
     print('Start calculating group portrait...')
     group_portrait(group_dic['group_id'], group_dic['userlist'], start_date, end_date)
-    
+
     print('Start calculating group ranking...')
     group_ranking(group_dic['group_id'], group_dic['group_name'], group_dic['userlist'], end_date)
 
@@ -75,7 +76,7 @@ def event_main(keywords, event_id, start_date, end_date):
 
     print('Start text analyze...')
     get_text_analyze(event_id, event_mapping_name)
-    
+
     print('Start event portrait...')
     # userlist = es.get(index='event_information',doc_type='text',id=event_id)['_source']['userlist']
     event_portrait(event_id, event_mapping_name, userlist, start_date, end_date)
@@ -88,7 +89,7 @@ def politics_main(keywords, politics_id, start_date, end_date):
     create_politics_mapping(politics_mapping_name)
     userlist = politics_create(politics_mapping_name, keywords, start_date, end_date)
     es.update(index=POLITICS_INFORMATION,doc_type='text',body={'doc':{'userlist':userlist}},id=politics_id)
-    
+
     print('Start politics portrait...')
     # userlist = es.get(index='politics_information',doc_type='text',id=politics_id)['_source']['userlist']
     politics_portrait(politics_id, politics_mapping_name, userlist, start_date, end_date)
@@ -152,7 +153,7 @@ if __name__ == '__main__':
     # dic = {
     #     "remark": "第九次群体测试",
     #     "keyword": "",
-    #     "create_condition": { 
+    #     "create_condition": {
     #         "machiavellianism_index": 0,
     #         "narcissism_index": 5,
     #         "psychopathy_index": 0,
