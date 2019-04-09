@@ -7,7 +7,6 @@ import numpy as np
 import math
 import json
 import sys
-import re
 
 sys.path.append('../../../')
 from config import *
@@ -15,12 +14,7 @@ from time_utils import *
 from global_utils import *
 
 
-def get_queue_index(timestamp):
-    time_struc = time.gmtime(float(timestamp))
-    hour = time_struc.tm_hour
-    minute = time_struc.tm_min
-    index = hour*4+math.ceil(minute/15.0) #every 15 minutes
-    return int(index)
+
 
 def judge_user_weibo_rel_exist(uid):#判断此条微博用户 微博关系信息是否存在
     try:#判断此条微博用户 微博关系信息是否存在 
@@ -307,7 +301,6 @@ def run_cal(today,gte_time):
     if len(result_weibo) != 0:
             #统计用户每条微博的转发关系 为了影响力
         es.index(index="flow_timestamp", doc_type="text",body = {"date":today,"timestamp":int(gte_time) + 300})
-        print(len(result_weibo))
         for i ,weiboinfo in enumerate(result_weibo):
             cal_user_weibo_relation_info(weiboinfo["_source"])#统计用户每条微博的转发关系
 
@@ -347,11 +340,11 @@ def get_infludece_index():
     es_result = es.search(index="flow_timestamp", doc_type="text", body = query_dict)["aggregations"]["groupby"]["buckets"]
     if len(es_result):#此天以执行程序
         gte_time = es_result[0]["max_index"]["value"]
-        print(gte_time)
+        #print(gte_time)
         run_cal(today,gte_time)
     else:
         gte_time = date2ts(today)
-        print(gte_time)
+        #print(gte_time)
         run_cal(today,gte_time)
 
 if __name__ == '__main__':
