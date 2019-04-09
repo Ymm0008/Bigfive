@@ -137,7 +137,7 @@ def cal_user_personality(uid_list, start_date, end_date):
             'date':end_date
         }
 
-        es.index(index=USER_PERSONALITY,doc_type='text',body=dic,id=uid + '_' + str(timestamp))
+        es.index(index=USER_PERSONALITY,doc_type='text',body=dic,id=str(uid) + '_' + str(timestamp))
 
 #对模型直接输出的结果进行转换，便于数据库存取
 def get_user_personality_label(personality_label_old):
@@ -183,6 +183,8 @@ def group_create(args_dict, keywords, remark, group_name, create_time, start_dat
         for date in date_list:
             print(date)
             weibo_index = 'flow_text_%s' % date
+            if not es.indices.exists(index = weibo_index):
+                continue
             weibo_generator = get_weibo_generator(weibo_index, weibo_query_body, USER_WEIBO_ITER_COUNT)
             for res in weibo_generator:
                 uid_list_keyword.extend([hit['_source']['uid'] for hit in res])

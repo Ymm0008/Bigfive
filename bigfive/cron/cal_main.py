@@ -97,8 +97,42 @@ def politics_main(keywords, politics_id, start_date, end_date):
     print('Successfully create politics...')
 
 
+def get_user_generator(user_index, query_body, iter_num_per):
+    if not es.indices.exists(index=user_index):
+        print('Index %s does not exist, return an empty list...' % user_index)
+        return []
+    iter_num = 0
+    iter_get_user = iter_num_per
+    total = -1
+    while (iter_get_user == iter_num_per):
+        print("user_iter_num: %d, total: %d" % (iter_num*iter_num_per, total))
+        query_body['sort'] = {'uid':{'order':'asc'}}
+        query_body['size'] = iter_num_per
+        query_body['from'] = iter_num * iter_num_per
+        es_result = es.search(index=user_index,doc_type='text',body=query_body)
+        total = es_result['hits']['total']
+        es_result = es_result['hits']['hits']
+        iter_get_user = len(es_result)
+        if iter_get_user == 0:
+            break
+        iter_num += 1
+        yield es_result
+
+
 
 if __name__ == '__main__':
+
+    es_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    while True:
+        es_result = next(es_result)
+        uid_list = []
+        username_list = []
+        for k,v in enumerate(es_result):
+            uid_list.append(es_result[k]["_source"]["uid"])
+            username_list.append(es_result[k]["_source"]["uid"])
+        user_main(uid_list,username_list,'2016-11-13','2016-11-16')
+
+        
     # user_main(['1978574705','2596620224'],['闱闱祯祯','时尚女生爱购物'],'2016-11-13','2016-11-27')
     # group_main(1,2,3,4,5)
 

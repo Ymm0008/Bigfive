@@ -9,6 +9,8 @@ from config import *
 from time_utils import *
 from global_utils import *
 
+BigV_NUM = 30000
+
 
 
 def get_user_ranking():
@@ -58,7 +60,7 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
             #print(es_result[0])
             for item in es_result:
                 if int(item["_source"]["sentiment"]) == 1: #积极用户
-                    if item["_source"]["user_fansnum"] >= 100000:
+                    if item["_source"]["user_fansnum"] >= BigV_NUM:
                         #print(type(item["_source"]["user_fansnum"]))
                         mid_user["positive"]["bigv_user"].append(item["_id"])
                         if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["p_bigv_user"]:
@@ -69,7 +71,7 @@ def get_politics_user(politics_id, politic_mapping_name, uidlist):
                             uid_user["p_ordinary_user"].append(item["_source"]["uid"])
                 else:#消极用户
                     if int(item["_source"]["sentiment"]) > 1:
-                        if item["_source"]["user_fansnum"] >= 100000:
+                        if item["_source"]["user_fansnum"] >= BigV_NUM:
                             mid_user["negative"]["bigv_user"].append(item["_id"])
                             if item["_source"]["uid"] in uidlist and item["_source"]["uid"] not in uid_user["n_bigv_user"]:
                                 uid_user["n_bigv_user"].append(item["_source"]["uid"])
