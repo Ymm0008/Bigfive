@@ -45,7 +45,7 @@ def get_event_static(event_id, event_mapping_name, start_date, end_date):
                 es_result = next(ESIterator1)
 
                 for item in es_result:
-                    if not item["_source"]["geo"].startswith('中国'):
+                    if not item["_source"]["geo"].startswith('中国') or  len(item["_source"]["geo"].split("&"))<=1:
                         pass
                     elif item["_source"]["geo"] not in geo_dict:
                         geo_dict[item["_source"]["geo"]] = 1
