@@ -19,8 +19,8 @@ from global_utils import *
 from portrait.cron_portrait import user_ranking, cal_user_personality, group_create, group_ranking, cal_group_personality
 from portrait.user.cron_user import user_portrait
 from portrait.group.cron_group import group_portrait
-# from cron_event import event_create, get_text_analyze, event_portrait
-# from event_mapping import create_event_mapping
+from cron_event import event_create, get_text_analyze, event_portrait
+from event_mapping import create_event_mapping
 from portrait.user.user_text_analyze import cal_user_text_analyze
 from cron_politics import politics_create, politics_portrait
 from politics_mapping import create_politics_mapping
