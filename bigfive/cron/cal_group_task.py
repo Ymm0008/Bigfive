@@ -26,7 +26,7 @@ def main():
 		remark = task['_source']['remark']
 		group_name = task['_source']['group_name']
 		create_time = task['_source']['create_time']
-		create_time = 1480176000
+		# create_time = 1480176000
 		es.update(index=GROUP_TASK,doc_type='text',id=task_id,body={'doc':{'progress':1}})   #计算中
 		cal_status = group_main(args_dict,keyword,remark,group_name,create_time)
 		if cal_status:

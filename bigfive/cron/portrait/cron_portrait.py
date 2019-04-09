@@ -183,6 +183,8 @@ def group_create(args_dict, keywords, remark, group_name, create_time, start_dat
         for date in date_list:
             print(date)
             weibo_index = 'flow_text_%s' % date
+            if not es.indices.exists(index = weibo_index):
+                continue
             weibo_generator = get_weibo_generator(weibo_index, weibo_query_body, USER_WEIBO_ITER_COUNT)
             for res in weibo_generator:
                 uid_list_keyword.extend([hit['_source']['uid'] for hit in res])
