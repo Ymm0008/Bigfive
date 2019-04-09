@@ -363,15 +363,6 @@ def wordCount(segment_list):
 zh_text = ['nick_name','rel_name','description','sp_type','user_location']
 
 
-# def get_uidlist():
-#     query_body = {"query": {"bool": {"must": [{"match_all": { }}]}},"size":15000}
-#     es_result = es.search(index="user_information", doc_type="text",body=query_body)["hits"]["hits"]
-#     uid_list = []
-#     for es_item in es_result:
-#         uid_list.append(es_item["_id"])
-#     return uid_list
-
-
 def get_uid_weibo(uid,index_name):
 
     uid_word_dict = dict()
@@ -426,24 +417,24 @@ def get_user(uid):
     information_dict = dict()
 
     for field in ["user_location","fans_num","username","description"]:
-        try:
-            information_dict[field] = es_result[field]
+        # try:
+        #     information_dict[field] = es_result[field]
             
-        except:
-            if field != "fans_num":
-                information_dict[field] = ""
-            else:
-                information_dict[field] = 0
+        # except:
+        #     if field != "fans_num":
+        #         information_dict[field] = ""
+        #     else:
+        #         information_dict[field] = 0
 
-        # information_dict["user_location"] = es_result["user_location"]
-        # information_dict["fans_num"] = es_result["fans_num"]
-        # information_dict["username"] = es_result["username"]
-        # information_dict["description"] = es_result["description"]
+        information_dict["user_location"] = es_result["user_location"]
+        information_dict["fans_num"] = es_result["fans_num"]
+        information_dict["username"] = es_result["username"]
+        information_dict["description"] = es_result["description"]
 
 
     try:
-        information_dict["verified_type"] = es.search(index="weibo_user", doc_type="text",body=query_body)["hits"]["hits"][0]["_source"]["verified_type"]
-        information_dict["statusnum"] = es.search(index="weibo_user", doc_type="text",body=query_body)["hits"]["hits"][0]["_source"]["statuses_count"]
+        information_dict["verified_type"] = es.search(index=WEIBO_USER, doc_type="type1",body=query_body)["hits"]["hits"][0]["_source"]["verified_type"]
+        information_dict["statusnum"] = es.search(index=WEIBO_USER, doc_type="type1",body=query_body)["hits"]["hits"][0]["_source"]["statuses_count"]
     except Exception as ex:
         information_dict["verified_type"] = 999
         information_dict["statusnum"] = 0 
@@ -456,7 +447,7 @@ def get_friends(uid):
     friends_list = []
     query_body = {"query":{"bool":{"must":[{"term":{"uid":uid}}],"must_not":[],"should":[]}},"from":0,"size":10,"sort":[],"aggs":{}}
     try:
-        friends_list = es.search(index="weibo_user", doc_type="text",body=query_body)["hits"]["hits"][0]["_source"]["friends"]
+        friends_list = es.search(index=WEIBO_USER, doc_type="type1",body=query_body)["hits"]["hits"][0]["_source"]["friends"]
     except Exception as ex:
         friends_list = []
 
@@ -545,6 +536,17 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             }
         }
 
+    id_body2 = {
+        "query":{
+            "ids":{
+                "type":"text",
+                "values":[
+                    str(uid)
+                ]
+            }
+        }
+    }
+
     if domain!={} and r_domain!="":
 
         if es.search(index=USER_DOMAIN_TOPIC, doc_type='text', body= id_body)["hits"]["hits"] != []:
@@ -556,16 +558,7 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "main_domain" : r_domain,
             "has_new_information":1
                     } })
-            id_body2 = {
-            "query":{
-                "ids":{
-                    "type":"text",
-                    "values":[
-                        str(uid)
-                    ]
-                }
-            }
-        }
+ 
             # if es.search(index=USER_INFORMATION,doc_type='text', body=id_body2)["hits"]["hits"] != []:
             # es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":r_domain}})
             # else:
@@ -614,16 +607,8 @@ def save_user_domain(uid,timestamp,domain,r_domain):
             "main_domain" : "other",
             "has_new_information":0
                     } })
-            id_body2 = {
-            "query":{
-                "ids":{
-                    "type":"text",
-                    "values":[
-                        str(uid)
-                    ]
-                }
-            }
-        }
+
+
             # if es.search(index=USER_INFORMATION,doc_type='text', body=id_body2)["hits"]["hits"] != []:
             # es.update(index=USER_INFORMATION,doc_type='text', id=str(uid), body = {"doc":{"domain":"other"}})
             # else:
