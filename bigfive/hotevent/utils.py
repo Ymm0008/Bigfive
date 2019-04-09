@@ -108,9 +108,9 @@ def get_geo(event_id,geo,s, e):
         e = today()
         s = get_before_date(30)
     st = date2ts(s)
-    et = date2ts(e)
+    et = date2ts(e)+86399
     abroad_count = es.search(index='event_'+event_id, doc_type='text', body={'query': {'bool': {'must': [], 'must_not': [{'terms': {'geo': ['中国', '局域网']}}]}}, 'from': 0, 'size': 0})['hits']['total']
-    query = {"query": {"bool": {"must": [{"wildcard": {"geo": "*{}*".format(geo)}}, {"range": {"timestamp": {"gte": st, "lte": et}}}], "must_not": [], "should": []}}, "from": 0, "size": 100000, "sort": [], "aggs": {}}
+    query = {"query": {"bool": {"must": [{"wildcard": {"geo": "*{}*".format(geo)}}, {"range": {"timestamp": {"gte": st, "lte": et}}}], "must_not": [], "should": []}}, "from": 0, "size": 1000000, "sort": [], "aggs": {}}
     hits = es.search(index='event_'+event_id,
                      doc_type='text', body=query,_source_include=['geo'])['hits']['hits']
     if not hits:
