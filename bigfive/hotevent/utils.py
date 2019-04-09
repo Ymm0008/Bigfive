@@ -129,8 +129,7 @@ def get_geo(event_id,geo,s, e):
                 continue
         elif len(geo_list) > 2 and geo != '中国':
             # 拿到省名 并过滤掉类似中国&中山 中山是市
-            province = geo_list[1]
-            # .replace('市','').replace('省','').replace('自治区','')
+            province = geo_list[1].replace('市','').replace('省','').replace('自治区','')
             if province not in MAP_CITIES_DICT.keys():
                 continue
             # 中国&山西&太原
