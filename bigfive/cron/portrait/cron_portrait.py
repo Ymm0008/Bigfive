@@ -137,7 +137,7 @@ def cal_user_personality(uid_list, start_date, end_date):
             'date':end_date
         }
 
-        es.index(index=USER_PERSONALITY,doc_type='text',body=dic,id=uid + '_' + str(timestamp))
+        es.index(index=USER_PERSONALITY,doc_type='text',body=dic,id=str(uid) + '_' + str(timestamp))
 
 #对模型直接输出的结果进行转换，便于数据库存取
 def get_user_personality_label(personality_label_old):
