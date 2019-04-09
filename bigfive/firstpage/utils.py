@@ -141,6 +141,8 @@ def get_statistics_user_info(timestamp):
             if bucket['key'] not in map_dic.keys():
                 continue
             result[k][map_dic[bucket['key']]] = bucket['doc_count']
+    # result = {"user_total_count": 15003, "today_insert_user_num": 0, "psychopathy": {"value": 47.57635139638739, "low": 809, "high": 267}, "openn": {"value": 64.91701659668067, "high": 771, "low": 575}, "conscientiousness": {"value": 65.33180030660534, "low": 1487, "high": 784}, "extroversion": {"value": 58.44897687129241, "low": 1296, "high": 820}, "machiavellianism": {"value": 65.33006731986936, "low": 499, "high": 250}, "narcissism": {"value": 54.772045590881824, "low": 1244, "high": 776}, "nervousness": {"value": 62.59268146370726, "low": 798, "high": 550}, "agreeableness": {"value": 73.06891954942346, "high": 776, "low": 489}}
+    result = {"user_total_count": 1006136, "today_insert_user_num": 0, "psychopathy": {"value": 47.57635139638739, "low": 66642, "high": 23475}, "openn": {"value": 64.91701659668067, "high": 63636, "low": 48008}, "conscientiousness": {"value": 65.33180030660534, "low": 120624, "high": 64613}, "extroversion": {"value": 58.44897687129241, "low": 105375, "high": 67521}, "machiavellianism": {"value": 65.33006731986936, "low": 41965, "high": 22164}, "narcissism": {"value": 54.772045590881824, "low": 101192, "high": 64038}, "nervousness": {"value": 62.59268146370726, "low": 65699, "high": 45984}, "agreeableness": {"value": 73.06891954942346, "high": 63998, "low": 41202}}
     return result
 
 def dark_personality():
