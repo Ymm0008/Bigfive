@@ -343,8 +343,8 @@ def get_user_behavior(uid, interval):
                     {
                         "range": {
                             "date": {
-                                "gte": TODAY,
-                                "lte": THREE_MONTH_AGO
+                                "gte": THREE_MONTH_AGO,
+                                "lte": TODAY
                             }
                         }
                     }
