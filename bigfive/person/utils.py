@@ -6,7 +6,7 @@ import time
 
 from elasticsearch.helpers import scan
 
-from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO
+from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO
 from bigfive.cache import cache
 
 def judge_uid_or_nickname(keyword):
@@ -338,6 +338,14 @@ def get_user_behavior(uid, interval):
                     {
                         "term": {
                             "uid": uid
+                        }
+                    },
+                    {
+                        "range": {
+                            "date": {
+                                "gte": TODAY,
+                                "lte": THREE_MONTH_AGO
+                            }
                         }
                     }
                 ]
