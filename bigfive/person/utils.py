@@ -323,7 +323,7 @@ def user_emotion(uid, interval):
             }
         }
     }
-
+    print(query_body)
     buckets = es.search(index="user_emotion", doc_type="text", body=query_body)['aggregations']['groupDate']['buckets']
     result = {
         'time': [],
