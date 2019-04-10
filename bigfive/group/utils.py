@@ -5,7 +5,7 @@ import re
 from xpinyin import Pinyin
 
 from bigfive.time_utils import *
-from bigfive.config import es, MAX_VALUE, USER_RANKING, labels_dict, topic_dict
+from bigfive.config import es, MAX_VALUE, USER_RANKING, labels_dict, topic_dict, THREE_MONTH_AGO, TODAY
 from bigfive.cache import cache
 
 
@@ -455,6 +455,14 @@ def group_influence(group_id, interval):
                         "term": {
                             "group_id": group_id
                         }
+                    },
+                    {
+                        "range": {
+                            "date": {
+                                "gte": THREE_MONTH_AGO,
+                                "lte": TODAY
+                            }
+                        }
                     }
                 ]
             }
@@ -517,6 +525,14 @@ def group_emotion(group_id, interval):
                     {
                         "term": {
                             "group_id": group_id
+                        }
+                    },
+                    {
+                        "range": {
+                            "date": {
+                                "gte": THREE_MONTH_AGO,
+                                "lte": TODAY
+                            }
                         }
                     }
                 ]
