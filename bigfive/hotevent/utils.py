@@ -109,7 +109,7 @@ def get_geo(event_id,geo,s, e):
         s = get_before_date(30)
     st = date2ts(s)
     et = date2ts(e)+86399
-    abroad_count = es.search(index='event_'+event_id, doc_type='text', body={'query': {'bool': {'must': [], 'must_not': [{'terms': {'geo': ['中国', '局域网']}}]}}, 'from': 0, 'size': 0})['hits']['total']
+    abroad_count = es.search(index='event_'+event_id, doc_type='text', body={'query': {'bool': {'must': [], 'must_not': [{'terms': {'geo': ['中国', '局域网', '其他']}}]}}, 'from': 0, 'size': 0})['hits']['total']
     query = {"query": {"bool": {"must": [{"wildcard": {"geo": "*{}*".format(geo)}}, {"range": {"timestamp": {"gte": st, "lte": et}}}], "must_not": [], "should": []}}, "from": 0, "size": 1000000, "sort": [], "aggs": {}}
     hits = es.search(index='event_'+event_id,
                      doc_type='text', body=query,_source_include=['geo'])['hits']['hits']
@@ -118,7 +118,7 @@ def get_geo(event_id,geo,s, e):
     geo_dic = {}
     for hit in hits:
         item = hit['_source']
-        geo_list = item['geo'].split('&')
+        geo_list = item['geo'].replace('市','').replace('省','').replace('自治区','').split('&')
         if len(geo_list) == 1:
             continue
         if len(geo_list) > 1 and geo == '中国':
@@ -129,7 +129,7 @@ def get_geo(event_id,geo,s, e):
                 continue
         elif len(geo_list) > 2 and geo != '中国':
             # 拿到省名 并过滤掉类似中国&中山 中山是市
-            province = geo_list[1].replace('市','').replace('省','').replace('自治区','')
+            province = geo_list[1]
             if province not in MAP_CITIES_DICT.keys():
                 continue
             # 中国&山西&太原
@@ -167,7 +167,7 @@ def get_emotion_geo(event_id,emotion,geo):
         geo_dict = item['geo_dict']
         for geo_item in geo_dict:
             count = geo_item['count']
-            geo_list = geo_item['geo'].split('&')
+            geo_list = geo_item['geo'].replace('市','').replace('省','').replace('自治区','').split('&')
             if len(geo_list) == 1:
                 continue
             if len(geo_list) > 1 and geo == '中国':
@@ -511,7 +511,7 @@ def get_semantic(event_id):
     river_result = es.get(index='event_river', doc_type='text', id=event_id)['_source']
     cluster_count = json.loads(river_result['cluster_count'])
     # print(sorted(cluster_count.items(), key=lambda x:x[0]))
-    cluster_count_sorted = {}
+    cluster_count_sorted = OrderedDict()
     for i in sorted(cluster_count.items(), key=lambda x:x[0]):
         cluster_count_sorted[i[0]] = i[1]
     cluster_word = json.loads(river_result['cluster_word'])

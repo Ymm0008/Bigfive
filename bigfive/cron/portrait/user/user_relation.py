@@ -7,6 +7,7 @@ import numpy as np
 import math
 import json
 import sys
+import re
 
 sys.path.append('../../../')
 from config import *
@@ -26,8 +27,19 @@ def judge_user_weibo_rel_exist(uid):#判断此条微博用户 微博关系信息
   "retweeted_weibo":[],"retweeted_weibo_be_retweet":[],"retweeted_weibo_be_comment":[]})
         return True
 
+def get_queue_index(timestamp):
+    time_struc = time.gmtime(float(timestamp))
+    hour = time_struc.tm_hour
+    minute = time_struc.tm_min
+    index = hour * 4 + math.ceil(minute / 15.0)   # Every 15 minutes
+    return int(index)
+
 def cal_user_weibo_relation_info(item):
-    uid = int(item['uid'])#用户uid
+    try:
+        uid = int(item['uid'])#用户uid
+        print(item['uid'],ts2date(item['timestamp']))
+    except:
+        return
     if judge_user_weibo_rel_exist(uid):#此条微博用户已经具有表 拿出此条数据
         uid_es_result =es.get(index="user_weibo_relation_info", doc_type="text",id = uid)["_source"]
         fans_num = item['user_fansnum']
@@ -295,9 +307,10 @@ def run_cal(today,gte_time):
                             }
                         }}]
                     }},
-                "size":1000000000
+                "size":10000   #因为速度原因只能先计算一万
             }
     result_weibo = es_weibo.search(index=es_index, doc_type="text", body=query_body)["hits"]["hits"]
+    print(len(result_weibo))
     if len(result_weibo) != 0:
             #统计用户每条微博的转发关系 为了影响力
         es.index(index="flow_timestamp", doc_type="text",body = {"date":today,"timestamp":int(gte_time) + 300})
@@ -348,4 +361,9 @@ def get_infludece_index():
         run_cal(today,gte_time)
 
 if __name__ == '__main__':
-    get_infludece_index()
+    # get_infludece_index()
+    for today in get_datelist_v2("2019-03-30","2019-04-10"):
+        timestamp = date2ts(today)
+        for i in range(4, 288):
+            print(i)
+            run_cal(today, timestamp + 300 * i)
