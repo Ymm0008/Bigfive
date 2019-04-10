@@ -281,6 +281,14 @@ def user_emotion(uid, interval):
                         "term": {
                             "uid": uid
                         }
+                    },
+                    {
+                        "range": {
+                            "date": {
+                                "gte": THREE_MONTH_AGO,
+                                "lte": TODAY
+                            }
+                        }
                     }
                 ]
             }
@@ -694,6 +702,14 @@ def get_influence_feature(uid,interval):
                     {
                         "term": {
                             "uid": uid
+                        }
+                    },
+                    {
+                        "range": {
+                            "date": {
+                                "gte": THREE_MONTH_AGO,
+                                "lte": TODAY
+                            }
                         }
                     }
                 ]
