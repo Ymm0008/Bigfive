@@ -6,7 +6,7 @@ import time
 
 from elasticsearch.helpers import scan
 
-from bigfive.config import es, labels_dict, topic_dict, today, a_week_ago, MAX_VALUE, USER_RANKING
+from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO
 from bigfive.cache import cache
 
 def judge_uid_or_nickname(keyword):
@@ -405,7 +405,7 @@ def get_user_activity(uid):
                     },
                     {
                         "term": {
-                            "date": str(today)
+                            "date": str(TODAY)
                         }
                     }
                 ]
@@ -455,8 +455,8 @@ def get_user_activity(uid):
                     {
                         "range": {
                             "date": {
-                                "gte": a_week_ago,
-                                "lte": today
+                                "gte": A_WEEK_AGO,
+                                "lte": TODAY
                             }
                         }
                     }
@@ -509,8 +509,8 @@ def get_user_activity(uid):
                     {
                         "range": {
                             "date": {
-                                "gt": a_week_ago,
-                                "lte": today
+                                "gt": A_WEEK_AGO,
+                                "lte": TODAY
                             }
                         }
                     }
@@ -592,7 +592,7 @@ def get_user_activity(uid):
 
 def get_preference_identity(uid):
     result = {}
-    today_ts = int(time.mktime(time.strptime(today, '%Y-%m-%d')))
+    today_ts = int(time.mktime(time.strptime(TODAY, '%Y-%m-%d')))
     query = {
         "query": {
             "bool": {
