@@ -16,35 +16,90 @@ from model.personality_predict import predict_personality
 #用户计算
 
 #从每日的人格计算表和画像计算表中读取对应数值，这些数据均为归一化在0-100之内的，并通过阈值给出画像的星级和人格的标签
-def user_ranking(uid_list,username_list,date):
+def user_ranking(uid_list,push_status_list,username_list,date):
+    #最新人格获取，只有最近计算好但还没有被推入主表的人才拿到人格
     query_id_list = [uid + '_' + str(date2ts(date)) for uid in uid_list]
     res = es.mget(index=USER_PERSONALITY, doc_type='text', body={'ids':query_id_list})['docs']
-    personality_dic = {i['_source']['uid']:i['_source'] for i in res}
+    personality_dic = {i['_source']['uid']:i['_source'] for i in res in i['found']}
+
+    # 最新影响力获取
     res = es.mget(index=USER_INFLUENCE, doc_type='text', body={'ids':query_id_list})['docs']
-    attribute_dic = {i['_source']['uid']:i['_source'] for i in res}
+    attribute_dic = {}
+    for i in res:
+        if i['found']:
+            attribute_dic[i['_source']['uid']] = i['_source']
+        else:
+            query_body = {
+                'query':{
+                    'bool':{
+                        'must':[
+                            {'term':{'uid':i['_id']}},
+                            {'range':{'timestamp':{'lte':date2ts(date)}}}
+                        ]
+                    }
+                },
+                'sort':{
+                    'timestamp':{
+                        'order':'desc'
+                    }
+                }
+            }
+            res_new = es.search(index=USER_INFLUENCE, doc_type='text', body=query_body)['hits']['hits']
+            if len(res_new):
+                attribute_dic[i['_id']] = res_new[0]['_source']
+            else:
+                attribute_dic[i['_id']] = {
+                    'activity_normalization':0,
+                    'importance_normalization':0,
+                    'sensitivity_normalization':0,
+                    'influence_normalization':0,
+                }
+
 
     for idx in range(len(uid_list)):
         uid = uid_list[idx]
         username = username_list[idx]
+        push_status = push_status_list[idx]
 
-        #黑暗+大五人格计算值
-        machiavellianism_index = personality_dic[uid]['machiavellianism_index']
-        narcissism_index = personality_dic[uid]['narcissism_index']
-        psychopathy_index = personality_dic[uid]['psychopathy_index']
-        extroversion_index = personality_dic[uid]['extroversion_index']
-        nervousness_index = personality_dic[uid]['nervousness_index']
-        openn_index = personality_dic[uid]['openn_index']
-        agreeableness_index = personality_dic[uid]['agreeableness_index']
-        conscientiousness_index = personality_dic[uid]['conscientiousness_index']
+        #黑暗+大五人格计算值,只有未推入ranking表的时候才查询推入
+        if push_status == 0:
+            machiavellianism_index = personality_dic[uid]['machiavellianism_index']
+            narcissism_index = personality_dic[uid]['narcissism_index']
+            psychopathy_index = personality_dic[uid]['psychopathy_index']
+            extroversion_index = personality_dic[uid]['extroversion_index']
+            nervousness_index = personality_dic[uid]['nervousness_index']
+            openn_index = personality_dic[uid]['openn_index']
+            agreeableness_index = personality_dic[uid]['agreeableness_index']
+            conscientiousness_index = personality_dic[uid]['conscientiousness_index']
 
-        machiavellianism_label = personality_dic[uid]['machiavellianism_label']
-        narcissism_label = personality_dic[uid]['narcissism_label']
-        psychopathy_label = personality_dic[uid]['psychopathy_label']
-        extroversion_label = personality_dic[uid]['extroversion_label']
-        nervousness_label = personality_dic[uid]['nervousness_label']
-        openn_label = personality_dic[uid]['openn_label']
-        agreeableness_label = personality_dic[uid]['agreeableness_label']
-        conscientiousness_label = personality_dic[uid]['conscientiousness_label']
+            machiavellianism_label = personality_dic[uid]['machiavellianism_label']
+            narcissism_label = personality_dic[uid]['narcissism_label']
+            psychopathy_label = personality_dic[uid]['psychopathy_label']
+            extroversion_label = personality_dic[uid]['extroversion_label']
+            nervousness_label = personality_dic[uid]['nervousness_label']
+            openn_label = personality_dic[uid]['openn_label']
+            agreeableness_label = personality_dic[uid]['agreeableness_label']
+            conscientiousness_label = personality_dic[uid]['conscientiousness_label']
+
+            dic_personality = {
+                'machiavellianism_index':int(machiavellianism_index * 20),
+                'narcissism_index':int(narcissism_index * 20),
+                'psychopathy_index':int(psychopathy_index * 20),
+                'extroversion_index':int(extroversion_index * 20),
+                'nervousness_index':int(nervousness_index * 20),
+                'openn_index':int(openn_index * 20),
+                'agreeableness_index':int(agreeableness_index * 20),
+                'conscientiousness_index':int(conscientiousness_index * 20),
+
+                'machiavellianism_label':get_user_personality_label(machiavellianism_label),
+                'narcissism_label':get_user_personality_label(narcissism_label),
+                'psychopathy_label':get_user_personality_label(psychopathy_label),
+                'extroversion_label':get_user_personality_label(extroversion_label),
+                'nervousness_label':get_user_personality_label(nervousness_label),
+                'openn_label':get_user_personality_label(openn_label),
+                'agreeableness_label':get_user_personality_label(agreeableness_label),
+                'conscientiousness_label':get_user_personality_label(conscientiousness_label),
+            }
 
         #画像计算值
         liveness_index = attribute_dic[uid]['activity_normalization']
@@ -53,15 +108,6 @@ def user_ranking(uid_list,username_list,date):
         influence_index = attribute_dic[uid]['influence_normalization']
 
         dic = {
-            'machiavellianism_index':int(machiavellianism_index * 20),
-            'narcissism_index':int(narcissism_index * 20),
-            'psychopathy_index':int(psychopathy_index * 20),
-            'extroversion_index':int(extroversion_index * 20),
-            'nervousness_index':int(nervousness_index * 20),
-            'openn_index':int(openn_index * 20),
-            'agreeableness_index':int(agreeableness_index * 20),
-            'conscientiousness_index':int(conscientiousness_index * 20),
-
             'liveness_index':int(liveness_index),
             'importance_index':int(importance_index),
             'sensitive_index':int(sensitive_index),
@@ -72,19 +118,15 @@ def user_ranking(uid_list,username_list,date):
             'sensitive_star':get_attribute_star(sensitive_index),
             'influence_star':get_attribute_star(influence_index),
 
-            'machiavellianism_label':get_user_personality_label(machiavellianism_label),
-            'narcissism_label':get_user_personality_label(narcissism_label),
-            'psychopathy_label':get_user_personality_label(psychopathy_label),
-            'extroversion_label':get_user_personality_label(extroversion_label),
-            'nervousness_label':get_user_personality_label(nervousness_label),
-            'openn_label':get_user_personality_label(openn_label),
-            'agreeableness_label':get_user_personality_label(agreeableness_label),
-            'conscientiousness_label':get_user_personality_label(conscientiousness_label),
-
             'uid':uid,
             'username':username
         }
-        es.index(index=USER_RANKING,doc_type='text',body=dic,id=uid)
+        if push_status == 0:
+            dic.update(dic_personality)
+            es.index(index=USER_RANKING,doc_type='text',body=dic,id=uid)
+            es.update(index=USER_INFORMATION,doc_type='text',body={'doc':{'push_status':1}},id=uid)
+        else:   #如果已推入就只更新影响力
+            es.update(index=USER_RANKING,doc_type='text',body={'doc':dic},id=uid)
 
 #通过调用模型中的预测函数获取当天的模型预测情况并存入数据库，可指定时间窗口
 def cal_user_personality(uid_list, start_date, end_date):

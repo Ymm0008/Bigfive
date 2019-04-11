@@ -1,7 +1,10 @@
 # -*- coding: UTF-8 -*-
 import sys
 sys.path.append('../../../')
+sys.path.append('../../')
 sys.path.append('../')
+sys.path.append('../user/')
+sys.path.append('../user/sentiment_classification')
 from config import *
 from time_utils import *
 from global_utils import *
@@ -30,4 +33,5 @@ if __name__ == '__main__':
     # for date in get_datelist_v2('2019-03-30','2019-04-10'):
     #     daily_user_emotion(date)
     theday = today()
+    print('Calculating user emotion...')
     daily_user_emotion(theday)

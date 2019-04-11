@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import redis
 
 from elasticsearch import Elasticsearch
 
@@ -12,6 +13,8 @@ REDIS_PORT = 10010
 
 es = Elasticsearch(hosts=[{'host': ES_HOST, 'port': ES_PORT}], timeout=1000)
 es_weibo = Elasticsearch(hosts=[{'host': ES_HOST_WEIBO, 'port': ES_PORT_WEIBO}], timeout=1000)
+pool = redis.ConnectionPool(host=REDIS_HOST,port=REDIS_PORT)
+redis_r = redis.Redis(connection_pool=pool)
 
 # common parameter
 MAX_VALUE = 99999999
