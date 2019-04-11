@@ -417,19 +417,19 @@ def get_user(uid):
     information_dict = dict()
 
     for field in ["user_location","fans_num","username","description"]:
-        # try:
-        #     information_dict[field] = es_result[field]
+        try:
+            information_dict[field] = es_result[field]
             
-        # except:
-        #     if field != "fans_num":
-        #         information_dict[field] = ""
-        #     else:
-        #         information_dict[field] = 0
+        except:
+            if field != "fans_num":
+                information_dict[field] = ""
+            else:
+                information_dict[field] = 0
 
-        information_dict["user_location"] = es_result["user_location"]
-        information_dict["fans_num"] = es_result["fans_num"]
-        information_dict["username"] = es_result["username"]
-        information_dict["description"] = es_result["description"]
+        # information_dict["user_location"] = es_result["user_location"]
+        # information_dict["fans_num"] = es_result["fans_num"]
+        # information_dict["username"] = es_result["username"]
+        # information_dict["description"] = es_result["description"]
 
 
     try:
