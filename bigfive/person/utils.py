@@ -8,6 +8,8 @@ from elasticsearch.helpers import scan
 
 from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO
 from bigfive.cache import cache
+from bigfive.time_utils import yesterday
+
 
 def judge_uid_or_nickname(keyword):
     return True if re.findall('^\d+$', keyword) else False
@@ -421,7 +423,7 @@ def get_user_activity(uid):
                     },
                     {
                         "term": {
-                            "date": str(TODAY)
+                            "date": str(yesterday(TODAY))
                         }
                     }
                 ]

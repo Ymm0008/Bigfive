@@ -68,3 +68,6 @@ def get_before_date(date_cha,date=None):
     oneday = datetime.timedelta(days=date_cha)
     newday = today - oneday
     return str(newday)[:10]
+
+def yesterday(theday):
+    return time.strftime('%Y-%m-%d', time.localtime(datetime2ts(theday) - 24*3600))
