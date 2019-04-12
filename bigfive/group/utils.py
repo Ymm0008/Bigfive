@@ -456,14 +456,14 @@ def group_influence(group_id, interval):
                             "group_id": group_id
                         }
                     },
-                    {
-                        "range": {
-                            "date": {
-                                "gte": THREE_MONTH_AGO,
-                                "lte": TODAY
-                            }
-                        }
-                    }
+                    # {
+                    #     "range": {
+                    #         "date": {
+                    #             "gte": THREE_MONTH_AGO,
+                    #             "lte": TODAY
+                    #         }
+                    #     }
+                    # }
                 ]
             }
         },
@@ -527,14 +527,14 @@ def group_emotion(group_id, interval):
                             "group_id": group_id
                         }
                     },
-                    {
-                        "range": {
-                            "date": {
-                                "gte": THREE_MONTH_AGO,
-                                "lte": TODAY
-                            }
-                        }
-                    }
+                    # {
+                    #     "range": {
+                    #         "date": {
+                    #             "gte": THREE_MONTH_AGO,
+                    #             "lte": TODAY
+                    #         }
+                    #     }
+                    # }
                 ]
             }
         },

@@ -820,6 +820,14 @@ def user_social_contact(uid, map_type):
                         "term": {
                             'target': uid
                         }
+                    },
+                    {
+                        "range": {
+                            "date": {
+                                "gte": THREE_MONTH_AGO,
+                                "lte": TODAY
+                            }
+                        }
                     }
                 ]
             }
