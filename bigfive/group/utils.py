@@ -593,6 +593,7 @@ def group_social_contact(group_id, map_type):
         message_type = 3
     else:
         message_type = 2
+    group_create_date = es.get(index='group_information', id=group_id, doc_type='text')['_source']['create_date']
     query_body = {
         "query": {
             "filtered": {
@@ -612,6 +613,14 @@ def group_social_contact(group_id, map_type):
                             {
                                 "terms": {
                                     'source': user_list
+                                }
+                            },
+                            {
+                                "range": {
+                                    "date": {
+                                        "gte": THREE_MONTH_AGO,
+                                        "lte": group_create_date
+                                    }
                                 }
                             }
                         ]}
