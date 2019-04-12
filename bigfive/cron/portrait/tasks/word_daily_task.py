@@ -25,8 +25,8 @@ def daily_user_text(date):   #凌晨计算昨天的文本信息
 
 
 if __name__ == '__main__':
-    # for date in get_datelist_v2('2019-03-30','2019-04-10'):
-    #     daily_user_text(date)
-    theday = today()
-    print('Calculating daily_user_text...')
-    daily_user_text(theday)
+    for date in get_datelist_v2('2019-04-01','2019-04-10'):
+        daily_user_text(date)
+    # theday = today()
+    # print('Calculating daily_user_text...')
+    # daily_user_text(theday)

@@ -600,7 +600,25 @@ def cal_user_influence(uid,weibo_data_dict):
         ####重要度计算 要在user_domain_topic后计算重要度
         max_fansnum = get_max_fansnum()
         try:
-            domain_topic_result = es.get(index="user_domain_topic", doc_type="text", id = id_es)["_source"]
+            query_body = {
+                'query':{
+                    'term':{
+                        'uid':uid
+                    }
+                },
+                'sort':{
+                    'timestamp':{
+                        'order':'desc'
+                    }
+                }
+            }
+            domain_topic_result = es.search(index="user_domain_topic", doc_type="text",body=query_body)['hits']['hits']
+            if len(domain_topic_result):
+                domain_topic_result = domain_topic_result[0]['_source']
+            else:
+                print('user domain not found...')
+                raise ValueError
+
             topic_list = []
             for key in domain_topic_result.keys():
                 if "topic_" in key:

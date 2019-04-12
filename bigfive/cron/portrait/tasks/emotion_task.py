@@ -15,9 +15,14 @@ def daily_user_emotion(date):
     date = ts2date(int(date2ts(date)) - DAY)
     print(date)
     iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_num = 0
     while True:
         try:
             es_result = next(iter_result)
+            iter_num += 1
+            print(iter_num)
+            if iter_num <= 76:
+                continue
         except:
             break
         uid_list = []
@@ -30,8 +35,8 @@ def daily_user_emotion(date):
 
 
 if __name__ == '__main__':
-    # for date in get_datelist_v2('2019-03-30','2019-04-10'):
-    #     daily_user_emotion(date)
-    theday = today()
-    print('Calculating user emotion...')
-    daily_user_emotion(theday)
+    for date in get_datelist_v2('2019-03-30','2019-04-11'):
+        daily_user_emotion(date)
+    # theday = today()
+    # print('Calculating user emotion...')
+    # daily_user_emotion(theday)

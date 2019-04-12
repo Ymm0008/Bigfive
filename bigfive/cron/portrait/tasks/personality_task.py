@@ -12,9 +12,14 @@ def monthly_user_personality(date):
     date = ts2date(int(date2ts(date)) - DAY)
     print(date)
     iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_num = 0
     while True:
         try:
             es_result = next(iter_result)
+            iter_num += 1
+            print(iter_num)
+            if iter_num <= 222:
+                continue
         except:
             break
         uid_list = []
@@ -28,13 +33,13 @@ def monthly_user_personality(date):
 
 
 if __name__ == '__main__':
-    # for date in get_datelist_v2('2019-03-30','2019-04-10'):
-    #     monthly_user_personality(date)
-    theday = today()
-    date = time.strftime('%d', time.localtime(time.time()))
-    if date == "01":
-        print("Calculating user personality...")
-        monthly_user_personality(theday)
-    else:
-        print("not reach calculating user personality time")
-        pass
+    date = '2019-04-11'
+    monthly_user_personality(date)
+    # theday = today()
+    # date = time.strftime('%d', time.localtime(time.time()))
+    # if date == "01":
+    #     print("Calculating user personality...")
+    #     monthly_user_personality(theday)
+    # else:
+    #     print("not reach calculating user personality time")
+    #     pass

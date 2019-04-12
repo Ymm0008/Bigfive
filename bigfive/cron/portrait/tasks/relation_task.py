@@ -291,9 +291,7 @@ def cal_user_weibo_relation_info(item):
                                 es.update(index="user_weibo_relation_info", doc_type="text",id =middle_uid ,body = {"doc":{"retweeted_weibo_be_retweet":update_list_2}})
 
 
-def run_cal(today,gte_time):
-
-
+def run_cal(today,lte_time):   #算过去五分钟的微博
     es_index = "flow_text_" + str(today)
     #print(es_index)
     query_body = {
@@ -302,8 +300,8 @@ def run_cal(today,gte_time):
                     "must":[{
                         "range": {
                             "timestamp":{
-                                "gte": gte_time,
-                                "lt": int(gte_time) + 300
+                                "gt": int(lte_time) - 300,
+                                "lte": lte_time
                             }
                         }}]
                     }},
@@ -313,7 +311,7 @@ def run_cal(today,gte_time):
     print(len(result_weibo))
     if len(result_weibo) != 0:
             #统计用户每条微博的转发关系 为了影响力
-        es.index(index="flow_timestamp", doc_type="text",body = {"date":today,"timestamp":int(gte_time) + 300})
+        es.index(index="flow_timestamp", doc_type="text",body = {"date":today,"timestamp":lte_time})
         for i ,weiboinfo in enumerate(result_weibo):
             cal_user_weibo_relation_info(weiboinfo["_source"])#统计用户每条微博的转发关系
 
@@ -339,52 +337,57 @@ def run_cal_user(uid_list, start_date, end_date):
 
 
 def get_infludece_index():
+    while True:
+        today = ts2date(time.time())
+        
+        query_dict = {
+            "query": {
+            "bool": {
+              "must": [
+                {
+                  "term": {
+                    "date": today
+                  }
+                }
+              ]
+            }
+            },
+            "size": 0,
+            "aggs": {
+            "groupby": {
+              "terms": {
+                "field": "date"
+              },
+              "aggs": {
+                "max_index": {
+                  "max": {
+                    "field": "timestamp"
+                  }
+                }
+              }
+            }
+        }
+        }
+        es_result = es.search(index="flow_timestamp", doc_type="text", body = query_dict)["aggregations"]["groupby"]["buckets"]
+        if len(es_result):#此天以执行程序
+            lte_time = es_result[0]["max_index"]["value"]
+        else:
+            lte_time = date2ts(today)
 
-    
-    today = ts2date(time.time())
-    
-    query_dict = {
-        "query": {
-        "bool": {
-          "must": [
-            {
-              "term": {
-                "date": today
-              }
-            }
-          ]
-        }
-        },
-        "size": 0,
-        "aggs": {
-        "groupby": {
-          "terms": {
-            "field": "date"
-          },
-          "aggs": {
-            "max_index": {
-              "max": {
-                "field": "timestamp"
-              }
-            }
-          }
-        }
-    }
-    }
-    es_result = es.search(index="flow_timestamp", doc_type="text", body = query_dict)["aggregations"]["groupby"]["buckets"]
-    if len(es_result):#此天以执行程序
-        gte_time = es_result[0]["max_index"]["value"]
-        #print(gte_time)
-        run_cal(today,gte_time)
-    else:
-        gte_time = date2ts(today)
-        #print(gte_time)
-        run_cal(today,gte_time)
+        if lte_time > today:   #如果在五分钟内算完了五分钟的数据则等待30秒直到到了下个五分钟
+            time.sleep(30)
+        else:
+            run_cal(today,lte_time)
+            break
 
 if __name__ == '__main__':
-    get_infludece_index()
+    # get_infludece_index()
     # for today in get_datelist_v2("2019-03-30","2019-04-10"):
     #     timestamp = date2ts(today)
     #     for i in range(4, 288):
     #         print(i)
     #         run_cal(today, timestamp + 300 * i)
+
+    for date in get_datelist_v2("2019-03-30","2019-04-10"):
+        for i in range(int(86400/600)):
+            es.index(index='flow_timestamp',doc_type='text',body={"date":date,"timestamp":date2ts(date) + 600*i})
