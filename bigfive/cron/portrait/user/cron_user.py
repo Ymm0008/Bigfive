@@ -44,37 +44,37 @@ def user_portrait(uid, start_date,end_date):
     weibo_data_dict = get_weibo_data_dict(uid, start_date,end_date)
     #print(weibo_data_dict)
     
-    # print('Calculating user position...')
-    # get_user_activity(uid,start_date,end_date)
+    print('Calculating user position...')   #每日更新，这段时间内的需要全部更新
+    get_user_activity(uid,start_date,end_date)
 
-    # print('Calculating user topic...')
-    # get_user_topic(uid,start_date,end_date)
-    #
-    # print('Calculating user domain...')
-    # get_user_domain(uid,start_date,end_date)
-    #
-    # print('Calculating user activity...')
-    # get_user_weibo_type(uid,weibo_data_dict,start_date,end_date)
-    #
-    # print('Calculating user political...')
-    # get_user_political(uid, end_date,end_date)
-    #
-    # print('Calculating word analysis...')
-    # get_word_analysis(uid,start_date,end_date)
+    print('Calculating user topic...')   #每周更新，故首次计算只需要计算最末尾一天的数据
+    get_user_topic(uid,end_date,end_date)
+    
+    print('Calculating user domain...')   #每周更新，故首次计算只需要计算最末尾一天的数据
+    get_user_domain(uid,end_date,end_date)
+    
+    print('Calculating user activity...')   #每日更新，这段时间内的需要全部更新
+    get_user_weibo_type(uid,weibo_data_dict,start_date,end_date)
+    
+    print('Calculating user political...')   #每周更新，故首次计算只需要计算最末尾一天的数据
+    get_user_political(uid, end_date,end_date)
+    
+    print('Calculating word analysis...')      #每周更新，故首次计算只需要计算最末尾一天的数据
+    get_word_analysis(uid,end_date,end_date)
 
-    # print('Calculating user emotion...')
-    # #emo_time_s = time.time()
-    # cal_user_emotion(uid,weibo_data_dict)
-    # #emo_time_e = time.time()
-    # #print('Calculating user emotion time:',emo_time_e-emo_time_s)
+    print('Calculating user emotion...')   #每日更新，这段时间内的需要全部更新
+    #emo_time_s = time.time()
+    cal_user_emotion(uid,weibo_data_dict)
+    #emo_time_e = time.time()
+    #print('Calculating user emotion time:',emo_time_e-emo_time_s)
+    
+    print('Calculating user social...')   #每日更新，这段时间内的需要全部更新
+    #s_s_time = time.time()
+    cal_user_social(uid,weibo_data_dict)
+    #s_e_time = time.time()
+    #print('Calculating user social time:',s_e_time-s_s_time)
     #
-    # print('Calculating user social...')
-    # #s_s_time = time.time()
-    # cal_user_social(uid,weibo_data_dict)
-    # #s_e_time = time.time()
-    # #print('Calculating user social time:',s_e_time-s_s_time)
-    #
-    print('Calculating user influence...')
+    print('Calculating user influence...')   #每日更新，这段时间内的需要全部更新
     #i_s_time = time.time()
     cal_user_influence(uid,weibo_data_dict)
     #i_e_time = time.time()
