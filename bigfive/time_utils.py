@@ -25,7 +25,7 @@ def date2ts(date):
     return int(time.mktime(time.strptime(date, '%Y-%m-%d')))
 
 def datetime2ts(date):
-    return int(time.mktime(time.strptime(date, '%Y-%m-%d %H:%M:%S')))
+    return int(time.mktime(time.strptime(date, '%Y-%m-%d')))
 
 def window2time(window, size=24*60*60):
     return window*size
@@ -70,4 +70,4 @@ def get_before_date(date_cha,date=None):
     return str(newday)[:10]
 
 def yesterday(theday):
-    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(datetime2ts(theday) - 24*3600))
+    return time.strftime('%Y-%m-%d', time.localtime(datetime2ts(theday) - 24*3600))
