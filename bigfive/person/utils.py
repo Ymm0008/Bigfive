@@ -8,7 +8,7 @@ from elasticsearch.helpers import scan
 
 from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO
 from bigfive.cache import cache
-from bigfive.time_utils import yesterday, datetime2ts
+from bigfive.time_utils import yesterday, datetime2ts, ts2datetime
 
 
 def judge_uid_or_nickname(keyword):
@@ -581,18 +581,18 @@ def get_user_activity(uid):
             # item = {}
             one_week_geo_dict.setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', r'', geo_data['_source']['geo']), 0)
             one_week_geo_dict[re.sub(r'省|市|壮族|维吾尔族|回族|自治区', r'', geo_data['_source']['geo'])] += geo_data['_source']['count']
-            geo_dict.setdefault(geo_data['_source']['date'], {})
+            geo_dict.setdefault(ts2datetime(geo_data['_source']['timestamp']), {})
             try:
                 if geo_data['_source']['geo'].split('&')[1] == '其他':
                     continue
                 if geo_data['_source']['geo'].split('&')[0] != '中国':
                     continue
                 # geo_dict[geo_data['_source']['date']].setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', geo_data['_source']['geo'].split('&')[1]), 0)
-                geo_dict[geo_data['_source']['date']].setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', geo_data['_source']['geo']), 0)
+                geo_dict[ts2datetime(geo_data['_source']['timestamp'])].setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', geo_data['_source']['geo']), 0)
             except:
                 continue
             # geo_dict[geo_data['_source']['date']][re.sub(r'省|市|壮族|维吾尔族|回族|自治区', r'', geo_data['_source']['geo'].split('&')[1])] += geo_data['_source']['count']
-            geo_dict[geo_data['_source']['date']][re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', geo_data['_source']['geo'])] += geo_data['_source']['count']
+            geo_dict[ts2datetime(geo_data['_source']['timestamp'])][re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', geo_data['_source']['geo'])] += geo_data['_source']['count']
 
         one_week_geo_sorted = sorted(one_week_geo_dict.items(), key=lambda x: x[1], reverse=True)
         for i in range(5):
