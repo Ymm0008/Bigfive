@@ -499,7 +499,7 @@ def get_user_activity(uid):
                         "range": {
                             "date": {
                                 "gte": A_WEEK_AGO,
-                                "lte": TODAY
+                                "lte": str(yesterday(TODAY))
                             }
                         }
                     }
@@ -553,7 +553,7 @@ def get_user_activity(uid):
                         "range": {
                             "date": {
                                 "gt": A_WEEK_AGO,
-                                "lte": TODAY
+                                "lte": str(yesterday(TODAY))
                             }
                         }
                     }
