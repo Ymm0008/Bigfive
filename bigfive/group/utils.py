@@ -599,53 +599,28 @@ def group_social_contact(group_id, map_type):
             "filtered": {
                 "filter": {
                     "bool": {
-                        "should": [
+                        "must": [
                             {
-                                "bool": {
-                                    "must": [
-                                        {
-                                            "term": {
-                                                "message_type": message_type
-                                            }
-                                        },
-                                        {
-                                            "terms": {
-                                                'source': user_list
-                                            }
-                                        },
-                                        {
-                                            "range": {
-                                                "date": {
-                                                    "gte": THREE_MONTH_AGO,
-                                                    "lte": group_create_date
-                                                }
-                                            }
-                                        }
-                                    ]
+                                "term": {
+                                    "message_type": message_type
                                 }
                             },
                             {
-                                "bool": {
-                                    "must": [
-                                        {
-                                            "term": {
-                                                "message_type": message_type
-                                            }
-                                        },
-                                        {
-                                            "terms": {
-                                                'target': user_list
-                                            }
-                                        },
-                                        {
-                                            "range": {
-                                                "date": {
-                                                    "gte": THREE_MONTH_AGO,
-                                                    "lte": group_create_date
-                                                }
-                                            }
-                                        }
-                                    ]
+                                "terms": {
+                                    'target': user_list
+                                }
+                            },
+                            {
+                                "terms": {
+                                    'source': user_list
+                                }
+                            },
+                            {
+                                "range": {
+                                    "date": {
+                                        "gte": THREE_MONTH_AGO,
+                                        "lte": group_create_date
+                                    }
                                 }
                             }
                         ]}
