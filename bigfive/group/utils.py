@@ -599,28 +599,53 @@ def group_social_contact(group_id, map_type):
             "filtered": {
                 "filter": {
                     "bool": {
-                        "must": [
+                        "should": [
                             {
-                                "term": {
-                                    "message_type": message_type
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "term": {
+                                                "message_type": message_type
+                                            }
+                                        },
+                                        {
+                                            "terms": {
+                                                'source': user_list
+                                            }
+                                        },
+                                        {
+                                            "range": {
+                                                "date": {
+                                                    "gte": THREE_MONTH_AGO,
+                                                    "lte": group_create_date
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             },
                             {
-                                "terms": {
-                                    'target': user_list
-                                }
-                            },
-                            {
-                                "terms": {
-                                    'source': user_list
-                                }
-                            },
-                            {
-                                "range": {
-                                    "date": {
-                                        "gte": THREE_MONTH_AGO,
-                                        "lte": group_create_date
-                                    }
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "term": {
+                                                "message_type": message_type
+                                            }
+                                        },
+                                        {
+                                            "terms": {
+                                                'target': user_list
+                                            }
+                                        },
+                                        {
+                                            "range": {
+                                                "date": {
+                                                    "gte": THREE_MONTH_AGO,
+                                                    "lte": group_create_date
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         ]}
@@ -628,6 +653,7 @@ def group_social_contact(group_id, map_type):
         },
         "size": 10000,
     }
+    print(query_body)
     r = es.search(index="user_social_contact", doc_type="text",
                   body=query_body)["hits"]["hits"]
     node = []
