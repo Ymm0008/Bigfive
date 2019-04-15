@@ -834,31 +834,56 @@ def user_social_contact(uid, map_type):
             "bool": {
                 "should": [
                     {
-                        "term": {
-                            'source': uid
+                        "bool":{
+                            "must":[
+                                {
+                                    "term": {
+                                        'source': uid
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "message_type": message_type
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "date": {
+                                            "gte": THREE_MONTH_AGO,
+                                            "lte": TODAY
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
-                        "term": {
-                            'target': uid
+                        "bool": {
+                            "must": [
+                                {
+                                    "term": {
+                                        'target': uid
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "message_type": message_type
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "date": {
+                                            "gte": THREE_MONTH_AGO,
+                                            "lte": TODAY
+                                        }
+                                    }
+                                }
+                            ]
                         }
-                    }
+                    },
+
                 ],
-                "must": [
-                    {
-                        "term": {
-                            "message_type": message_type
-                        }
-                    },
-                    {
-                        "range": {
-                            "date": {
-                                "gte": THREE_MONTH_AGO,
-                                "lte": TODAY
-                            }
-                        }
-                    }
-                ]
+                "must": []
             }
         },
         "size": 1000,
