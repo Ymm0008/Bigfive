@@ -861,6 +861,7 @@ def user_social_contact(uid, map_type):
         },
         "size": 1000,
     }
+    print(query_body)
     r1 = es.search(index="user_social_contact", doc_type="text",
                    body=query_body)["hits"]["hits"]
     node = []
