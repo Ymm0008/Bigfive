@@ -832,12 +832,7 @@ def user_social_contact(uid, map_type):
     query_body = {
         "query": {
             "bool": {
-                "must": [
-                    {
-                        "term": {
-                            "message_type": message_type
-                        }
-                    },
+                "should": [
                     {
                         "term": {
                             'source': uid
@@ -846,6 +841,13 @@ def user_social_contact(uid, map_type):
                     {
                         "term": {
                             'target': uid
+                        }
+                    }
+                ],
+                "must": [
+                    {
+                        "term": {
+                            "message_type": message_type
                         }
                     },
                     {
