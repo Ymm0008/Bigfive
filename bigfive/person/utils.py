@@ -8,7 +8,7 @@ from elasticsearch.helpers import scan
 
 from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO
 from bigfive.cache import cache
-from bigfive.time_utils import yesterday
+from bigfive.time_utils import yesterday, datetime2ts
 
 
 def judge_uid_or_nickname(keyword):
@@ -448,7 +448,7 @@ def get_user_activity(uid):
                     },
                     {
                         "term": {
-                            "date": str(yesterday(TODAY))
+                            "timestamp": str(datetime2ts(yesterday(TODAY)))
                         }
                     }
                 ]
@@ -464,7 +464,6 @@ def get_user_activity(uid):
     }
 
     one_day_ip_rank = []
-    print('aaaaaaaaaaaaaaaaa', one_day_query)
     one_day_result = es.search(index='user_activity', doc_type='text', body=one_day_query)['hits']['hits']
     one_day_geo_item = {}
     for i in range(5):
@@ -472,8 +471,7 @@ def get_user_activity(uid):
             one_day_geo_item.setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', one_day_result[i]['_source']['geo'].split('&')[-1]), 0)
             one_day_geo_item[re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', one_day_result[i]['_source']['geo'].split('&')[-1])] += one_day_result[i]['_source']['count']
             item = {'rank': i+1, 'count': one_day_result[i]['_source']['count'], 'ip': one_day_result[i]['_source']['ip'], 'geo': one_day_result[i]['_source']['geo']}
-        except Exception as e:
-            print(e)
+        except:
             item = {'rank': i + 1, 'count': '-', 'ip': '-', 'geo': '-'}
         one_day_ip_rank.append(item)
     # print(one_day_ip_rank)
@@ -499,9 +497,9 @@ def get_user_activity(uid):
                     },
                     {
                         "range": {
-                            "date": {
-                                "gte": str(yesterday(A_WEEK_AGO)),
-                                "lte": str(yesterday(TODAY))
+                            "timestamp": {
+                                "gte": str(datetime2ts(yesterday(A_WEEK_AGO))),
+                                "lte": str(datetime2ts(yesterday(TODAY)))
                             }
                         }
                     }
@@ -524,7 +522,7 @@ def get_user_activity(uid):
             }
         }
     }
-    print('one_week_query', one_week_query)
+    # print('one_week_query', one_week_query)
     one_week_ip_rank = []
     one_week_result = \
     es.search(index='user_activity', doc_type='text', body=one_week_query)['aggregations']['ip_count']['buckets']
@@ -553,9 +551,9 @@ def get_user_activity(uid):
                     },
                     {
                         "range": {
-                            "date": {
-                                "gt": A_WEEK_AGO,
-                                "lte": str(yesterday(TODAY))
+                            "timestamp": {
+                                "gte": str(datetime2ts(yesterday(A_WEEK_AGO))),
+                                "lte": str(datetime2ts(yesterday(TODAY)))
                             }
                         }
                     }
@@ -573,7 +571,7 @@ def get_user_activity(uid):
             }
         ]
     }
-    print('ccccccccccccccccccccccc', geo_query)
+
     geo_result = es.search(index='user_activity', doc_type='text', body=geo_query)['hits']['hits']
     one_week_geo_rank = []
     if geo_result:
@@ -585,7 +583,6 @@ def get_user_activity(uid):
             one_week_geo_dict[re.sub(r'省|市|壮族|维吾尔族|回族|自治区', r'', geo_data['_source']['geo'])] += geo_data['_source']['count']
             geo_dict.setdefault(geo_data['_source']['date'], {})
             try:
-                print(geo_data['_source'])
                 if geo_data['_source']['geo'].split('&')[1] == '其他':
                     continue
                 if geo_data['_source']['geo'].split('&')[0] != '中国':
