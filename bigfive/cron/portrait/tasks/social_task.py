@@ -1,7 +1,9 @@
 # -*- coding: UTF-8 -*-
 import sys
 sys.path.append('../../../')
+sys.path.append('../../')
 sys.path.append('../')
+sys.path.append('../user/')
 from config import *
 from time_utils import *
 from global_utils import *
@@ -30,4 +32,5 @@ if __name__ == '__main__':
     # for date in get_datelist_v2('2019-03-30','2019-04-10'):
     #     daily_user_social(date)
     theday = today()
+    print('Calculating user social...')
     daily_user_social(theday)

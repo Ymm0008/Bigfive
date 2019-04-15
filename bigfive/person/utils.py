@@ -8,6 +8,8 @@ from elasticsearch.helpers import scan
 
 from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO
 from bigfive.cache import cache
+from bigfive.time_utils import yesterday
+
 
 def judge_uid_or_nickname(keyword):
     return True if re.findall('^\d+$', keyword) else False
@@ -59,30 +61,30 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     conscientiousness_rank = index_to_score_rank(conscientiousness_index)
 
     query = {"query": {"bool": {"must": [],"should": []}}}
-    if machiavellianism_index:
-        query['query']['bool']['must'].append({"range": {
-            "machiavellianism_index": {"gte": str(machiavellianism_rank[0]), "lt": str(machiavellianism_rank[1])}}})
-    if narcissism_index:
-        query['query']['bool']['must'].append(
-            {"range": {"narcissism_index": {"gte": str(narcissism_rank[0]), "lt": str(narcissism_rank[1])}}})
-    if psychopathy_index:
-        query['query']['bool']['must'].append(
-            {"range": {"psychopathy_index": {"gte": str(psychopathy_rank[0]), "lt": str(psychopathy_rank[1])}}})
-    if extroversion_index:
-        query['query']['bool']['must'].append(
-            {"range": {"extroversion_index": {"gte": str(extroversion_rank[0]), "lt": str(extroversion_rank[1])}}})
-    if nervousness_index:
-        query['query']['bool']['must'].append(
-            {"range": {"nervousness_index": {"gte": str(nervousness_rank[0]), "lt": str(nervousness_rank[1])}}})
-    if openn_index:
-        query['query']['bool']['must'].append(
-            {"range": {"openn_index": {"gte": str(openn_rank[0]), "lt": str(openn_rank[1])}}})
-    if agreeableness_index:
-        query['query']['bool']['must'].append(
-            {"range": {"agreeableness_index": {"gte": str(agreeableness_rank[0]), "lt": str(agreeableness_rank[1])}}})
-    if conscientiousness_index:
-        query['query']['bool']['must'].append({"range": {
-            "conscientiousness_index": {"gte": str(conscientiousness_rank[0]), "lt": str(conscientiousness_rank[1])}}})
+    # if machiavellianism_index:
+    #     query['query']['bool']['must'].append({"range": {
+    #         "machiavellianism_index": {"gte": str(machiavellianism_rank[0]), "lt": str(machiavellianism_rank[1])}}})
+    # if narcissism_index:
+    #     query['query']['bool']['must'].append(
+    #         {"range": {"narcissism_index": {"gte": str(narcissism_rank[0]), "lt": str(narcissism_rank[1])}}})
+    # if psychopathy_index:
+    #     query['query']['bool']['must'].append(
+    #         {"range": {"psychopathy_index": {"gte": str(psychopathy_rank[0]), "lt": str(psychopathy_rank[1])}}})
+    # if extroversion_index:
+    #     query['query']['bool']['must'].append(
+    #         {"range": {"extroversion_index": {"gte": str(extroversion_rank[0]), "lt": str(extroversion_rank[1])}}})
+    # if nervousness_index:
+    #     query['query']['bool']['must'].append(
+    #         {"range": {"nervousness_index": {"gte": str(nervousness_rank[0]), "lt": str(nervousness_rank[1])}}})
+    # if openn_index:
+    #     query['query']['bool']['must'].append(
+    #         {"range": {"openn_index": {"gte": str(openn_rank[0]), "lt": str(openn_rank[1])}}})
+    # if agreeableness_index:
+    #     query['query']['bool']['must'].append(
+    #         {"range": {"agreeableness_index": {"gte": str(agreeableness_rank[0]), "lt": str(agreeableness_rank[1])}}})
+    # if conscientiousness_index:
+    #     query['query']['bool']['must'].append({"range": {
+    #         "conscientiousness_index": {"gte": str(conscientiousness_rank[0]), "lt": str(conscientiousness_rank[1])}}})
     if keyword:
         # user_query = '{"wildcard":{"uid": "%s*"}}' % keyword if judge_uid_or_nickname(
         #     keyword) else '{"wildcard":{"username": "*%s*"}}' % keyword
@@ -93,13 +95,38 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     query['sort'] = sort_list
     # query['sort'] = [{i: {'order': order_type}} for i in order_name.split(',')]
     # query['sort'] = [{order_name: {"order": order_type}}]
-
+    print(query)
     hits = es.search(index='user_ranking', doc_type='text', body=query)['hits']
 
     result = {'rows': [], 'total': hits['total']}
     for item in hits['hits']:
         item['_source']['big_five_list'] = []
         item['_source']['dark_list'] = []
+
+        if machiavellianism_index:
+            if machiavellianism_rank[0] <= item['_source']['machiavellianism_index'] < machiavellianism_rank[1]:
+                continue
+        if narcissism_index:
+            if narcissism_rank[0] <= item['_source']['narcissism_index'] < narcissism_rank[1]:
+                continue
+        if psychopathy_index:
+            if psychopathy_rank[0] <= item['_source']['psychopathy_index'] < psychopathy_rank[1]:
+                continue
+        if extroversion_index:
+            if extroversion_rank[0] <= item['_source']['extroversion_index'] < extroversion_rank[1]:
+                continue
+        if nervousness_index:
+            if nervousness_rank[0] <= item['_source']['nervousness_index'] < nervousness_rank[1]:
+                continue
+        if openn_index:
+            if openn_rank[0] <= item['_source']['openn_index'] < openn_rank[1]:
+                continue
+        if agreeableness_index:
+            if agreeableness_rank[0] <= item['_source']['agreeableness_index'] < agreeableness_rank[1]:
+                continue
+        if conscientiousness_index:
+            if conscientiousness_rank[0] <= item['_source']['conscientiousness_index'] < conscientiousness_rank[1]:
+                continue
 
         if item['_source']['extroversion_label'] == 0:
             item['_source']['big_five_list'].append({'外倾性': '0'})  # 0代表极端低
@@ -421,7 +448,7 @@ def get_user_activity(uid):
                     },
                     {
                         "term": {
-                            "date": str(TODAY)
+                            "date": str(yesterday(TODAY))
                         }
                     }
                 ]
@@ -472,7 +499,7 @@ def get_user_activity(uid):
                         "range": {
                             "date": {
                                 "gte": A_WEEK_AGO,
-                                "lte": TODAY
+                                "lte": str(yesterday(TODAY))
                             }
                         }
                     }
@@ -526,7 +553,7 @@ def get_user_activity(uid):
                         "range": {
                             "date": {
                                 "gt": A_WEEK_AGO,
-                                "lte": TODAY
+                                "lte": str(yesterday(TODAY))
                             }
                         }
                     }
@@ -819,6 +846,14 @@ def user_social_contact(uid, map_type):
                     {
                         "term": {
                             'target': uid
+                        }
+                    },
+                    {
+                        "range": {
+                            "date": {
+                                "gte": THREE_MONTH_AGO,
+                                "lte": TODAY
+                            }
                         }
                     }
                 ]

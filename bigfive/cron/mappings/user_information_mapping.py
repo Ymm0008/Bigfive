@@ -74,7 +74,13 @@ index_info = {
                  "photo_url":{#头像 URL
                     "index":"not_analyzed",
                     "type" : "string"
-                }
+                },
+                 "progress":{#计算状态
+                    "type" : "long"
+                },
+                 "push_status":{#计算状态
+                    "type" : "long"
+                },
             }
         }
     }
