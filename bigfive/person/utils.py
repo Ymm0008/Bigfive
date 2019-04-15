@@ -585,9 +585,9 @@ def get_user_activity(uid):
             one_week_geo_dict[re.sub(r'省|市|壮族|维吾尔族|回族|自治区', r'', geo_data['_source']['geo'])] += geo_data['_source']['count']
             geo_dict.setdefault(geo_data['_source']['date'], {})
             try:
-                if geo_data['_source']['geo'].split('&')[1] == '其他':
+                if '其他' in geo_data['_source']['geo'].split('&')[1]:
                     continue
-                if geo_data['_source']['geo'].split('&')[0] != '中国':
+                if '中国' not in geo_data['_source']['geo'].split('&')[0]:
                     continue
                 # geo_dict[geo_data['_source']['date']].setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', geo_data['_source']['geo'].split('&')[1]), 0)
                 geo_dict[geo_data['_source']['date']].setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', geo_data['_source']['geo']), 0)
