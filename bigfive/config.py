@@ -165,8 +165,9 @@ DOMAIN_WEIGHT_DICT = {'university':0.8, 'homeadmin':0.6, 'abroadadmin':1, 'homem
 
 # 测试用的逻辑"今天"及"一周前"
 # today = '2016-11-27'
-TODAY = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+#TODAY = time.strftime('%Y-%m-%d', time.localtime(time.time()))
 # a_week_ago = time.strftime('%Y-%m-%d', time.localtime(int(time.mktime(time.strptime(today, '%Y-%m-%d'))) - 7 * 24 * 60 * 60))
+TODAY = '2016-11-27'
 A_WEEK_AGO = time.strftime('%Y-%m-%d', time.localtime(int(time.mktime(time.strptime(TODAY, '%Y-%m-%d'))) - 7 * 24 * 60 * 60))
 THREE_MONTH_AGO = time.strftime('%Y-%m-%d', time.localtime(int(time.mktime(time.strptime(TODAY, '%Y-%m-%d'))) - 90 * 24 * 60 * 60))
 
