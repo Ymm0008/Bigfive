@@ -464,6 +464,7 @@ def get_user_activity(uid):
     }
 
     one_day_ip_rank = []
+    print('aaaaaaaaaaaaaaaaa', one_day_query)
     one_day_result = es.search(index='user_activity', doc_type='text', body=one_day_query)['hits']['hits']
     one_day_geo_item = {}
     for i in range(5):
@@ -471,7 +472,8 @@ def get_user_activity(uid):
             one_day_geo_item.setdefault(re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', one_day_result[i]['_source']['geo'].split('&')[-1]), 0)
             one_day_geo_item[re.sub(r'省|市|壮族|维吾尔族|回族|自治区', '', one_day_result[i]['_source']['geo'].split('&')[-1])] += one_day_result[i]['_source']['count']
             item = {'rank': i+1, 'count': one_day_result[i]['_source']['count'], 'ip': one_day_result[i]['_source']['ip'], 'geo': one_day_result[i]['_source']['geo']}
-        except:
+        except Exception as e:
+            print(e)
             item = {'rank': i + 1, 'count': '-', 'ip': '-', 'geo': '-'}
         one_day_ip_rank.append(item)
     # print(one_day_ip_rank)
@@ -498,7 +500,7 @@ def get_user_activity(uid):
                     {
                         "range": {
                             "date": {
-                                "gte": A_WEEK_AGO,
+                                "gte": str(yesterday(A_WEEK_AGO)),
                                 "lte": str(yesterday(TODAY))
                             }
                         }
@@ -522,7 +524,7 @@ def get_user_activity(uid):
             }
         }
     }
-    # print('one_week_query', one_week_query)
+    print('one_week_query', one_week_query)
     one_week_ip_rank = []
     one_week_result = \
     es.search(index='user_activity', doc_type='text', body=one_week_query)['aggregations']['ip_count']['buckets']
@@ -571,7 +573,7 @@ def get_user_activity(uid):
             }
         ]
     }
-
+    print('ccccccccccccccccccccccc', geo_query)
     geo_result = es.search(index='user_activity', doc_type='text', body=geo_query)['hits']['hits']
     one_week_geo_rank = []
     if geo_result:
