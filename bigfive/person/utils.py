@@ -16,6 +16,8 @@ def judge_uid_or_nickname(keyword):
 
 
 def index_to_score_rank(index):
+    if not index:
+        index = 0
     index_to_score_rank_dict = {
         0: [0, 101],
         1: [0, 20],
