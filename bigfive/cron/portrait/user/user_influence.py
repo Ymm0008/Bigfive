@@ -12,6 +12,7 @@ from config import *
 from time_utils import *
 from global_utils import *
 
+
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 Fifteenminutes = 15
 
@@ -52,9 +53,9 @@ def get_day_activeness(user_day_activeness_geo, user_day_activeness_time,uid):
 
     statusnum = user_day_activeness_time[uid]['statusnum']
     activity_geo_count = len(user_day_activeness_geo.keys())
-    result = activeness_weight_dict['activity_time'] * math.log(max_freq  + 1) + \
+    result = int(activeness_weight_dict['activity_time'] * math.log(max_freq  + 1) + \
              activeness_weight_dict['activity_geo'] * math.log(activity_geo_count + 1) +\
-             activeness_weight_dict['statusnum'] * math.log(statusnum + 1)
+             activeness_weight_dict['statusnum'] * math.log(statusnum + 1))
     return result
 
 
@@ -411,22 +412,24 @@ def cal_influence_index(uid):
         origin_weibo_retweeted_top = [("0", 0)]
         origin_weibo_comment_top = [("0", 0)]
 
-        for i,origin_weibo_item in enumerate(uid_es_result["origin_weibo"]):#dict
-            if origin_weibo_item["retweet_num"] != 0:
-                origin_weibo_retweeted_total_number += origin_weibo_item["retweet_num"]
-                origin_weibo_retweeted_detail[origin_weibo_item["mid"]] = origin_weibo_item["retweet_num"]
-            if origin_weibo_item["comment_num"] != 0:
-                origin_weibo_comment_total_number += origin_weibo_item["comment_num"]
-                origin_weibo_comment_detail[origin_weibo_item["mid"]] = origin_weibo_item["comment_num"]
+        if len(uid_es_result["origin_weibo"]):
 
-        origin_weibo_retweeted_average_number = origin_weibo_retweeted_total_number * 1.0/ len(uid_es_result["origin_weibo"])
-        origin_weibo_comment_average_number = origin_weibo_comment_total_number * 1.0/ len(uid_es_result["origin_weibo"])
-        if origin_weibo_retweeted_detail:
-            order = sorted(origin_weibo_retweeted_detail.iteritems(), key=lambda x:x[1], reverse=True)
-            origin_weibo_retweeted_top = order[0:3] # list of top 3 weibo
-        if origin_weibo_comment_detail:
-            order = sorted(origin_weibo_comment_detail.iteritems(), key=lambda x:x[1], reverse=True)
-            origin_weibo_comment_top = order[0:3] # list of top 3 weibo
+            for i,origin_weibo_item in enumerate(uid_es_result["origin_weibo"]):#dict
+                if origin_weibo_item["retweet_num"] != 0:
+                    origin_weibo_retweeted_total_number += origin_weibo_item["retweet_num"]
+                    origin_weibo_retweeted_detail[origin_weibo_item["mid"]] = origin_weibo_item["retweet_num"]
+                if origin_weibo_item["comment_num"] != 0:
+                    origin_weibo_comment_total_number += origin_weibo_item["comment_num"]
+                    origin_weibo_comment_detail[origin_weibo_item["mid"]] = origin_weibo_item["comment_num"]
+            
+            origin_weibo_retweeted_average_number = origin_weibo_retweeted_total_number * 1.0/ len(uid_es_result["origin_weibo"])
+            origin_weibo_comment_average_number = origin_weibo_comment_total_number * 1.0/ len(uid_es_result["origin_weibo"])
+            if origin_weibo_retweeted_detail:
+                order = sorted(origin_weibo_retweeted_detail.items(), key=lambda x:x[1], reverse=True)
+                origin_weibo_retweeted_top = order[0:3] # list of top 3 weibo
+            if origin_weibo_comment_detail:
+                order = sorted(origin_weibo_comment_detail.items(), key=lambda x:x[1], reverse=True)
+                origin_weibo_comment_top = order[0:3] # list of top 3 weibo
 
         retweeted_weibo_retweeted_detail={}
         retweeted_weibo_comment_detail = {}
@@ -437,22 +440,24 @@ def cal_influence_index(uid):
         retweeted_weibo_retweeted_top = [("0", 0)]
         retweeted_weibo_comment_top = [("0", 0)]
 
-        for i,retweeted_weibo_item in enumerate(uid_es_result["retweeted_weibo"]):#dict
-            if retweeted_weibo_item["retweet_num"] != 0:
-                retweeted_weibo_retweeted_total_number += retweeted_weibo_item["retweet_num"]
-                retweeted_weibo_retweeted_detail[retweeted_weibo_item["mid"]] = retweeted_weibo_item["retweet_num"]
-            if retweeted_weibo_item["comment_num"] != 0:
-                retweeted_weibo_comment_total_number += retweeted_weibo_item["comment_num"]
-                retweeted_weibo_comment_detail[retweeted_weibo_item["mid"]] = retweeted_weibo_item["comment_num"]
+        if len(uid_es_result["retweeted_weibo"]):
 
-        retweeted_weibo_retweeted_average_number = retweeted_weibo_retweeted_total_number * 1.0/ len(uid_es_result["retweeted_weibo"])
-        retweeted_weibo_comment_average_number = retweeted_weibo_comment_total_number * 1.0/ len(uid_es_result["retweeted_weibo"])
-        if retweeted_weibo_retweeted_detail:
-            order = sorted(retweeted_weibo_retweeted_detail.iteritems(), key=lambda x:x[1], reverse=True)
-            retweeted_weibo_retweeted_top = order[0:3] # list of top 3 weibo
-        if retweeted_weibo_comment_detail:
-            order = sorted(retweeted_weibo_comment_detail.iteritems(), key=lambda x:x[1], reverse=True)
-            retweeted_weibo_comment_top = order[0:3] # list of top 3 weibo
+            for i,retweeted_weibo_item in enumerate(uid_es_result["retweeted_weibo"]):#dict
+                if retweeted_weibo_item["retweet_num"] != 0:
+                    retweeted_weibo_retweeted_total_number += retweeted_weibo_item["retweet_num"]
+                    retweeted_weibo_retweeted_detail[retweeted_weibo_item["mid"]] = retweeted_weibo_item["retweet_num"]
+                if retweeted_weibo_item["comment_num"] != 0:
+                    retweeted_weibo_comment_total_number += retweeted_weibo_item["comment_num"]
+                    retweeted_weibo_comment_detail[retweeted_weibo_item["mid"]] = retweeted_weibo_item["comment_num"]
+
+            retweeted_weibo_retweeted_average_number = retweeted_weibo_retweeted_total_number * 1.0/ len(uid_es_result["retweeted_weibo"])
+            retweeted_weibo_comment_average_number = retweeted_weibo_comment_total_number * 1.0/ len(uid_es_result["retweeted_weibo"])
+            if retweeted_weibo_retweeted_detail:
+                order = sorted(retweeted_weibo_retweeted_detail.items(), key=lambda x:x[1], reverse=True)
+                retweeted_weibo_retweeted_top = order[0:3] # list of top 3 weibo
+            if retweeted_weibo_comment_detail:
+                order = sorted(retweeted_weibo_comment_detail.items(), key=lambda x:x[1], reverse=True)
+                retweeted_weibo_comment_top = order[0:3] # list of top 3 weibo
 
         origin_weibo_retweeted_brust= activity_weibo(uid_es_result["origin_weibo_be_retweet"])
         origin_weibo_comment_brust= activity_weibo(uid_es_result["origin_weibo_be_comment"])
@@ -472,7 +477,6 @@ def cal_influence_index(uid):
         user_fansnum = uid_es_result["fans_num"]
 
         influence = influence_cal(origin_weibo_total_number, retweeted_weibo_total_number, user_fansnum, influence_origin_weibo_retweeted, influence_origin_weibo_comment, influence_retweeted_weibo_retweeted, influence_retweeted_weibo_comment)
-    
         return influence
     except:
         influence = 0
@@ -697,4 +701,6 @@ def cal_user_influence(uid,weibo_data_dict):
 
 
 if __name__ == '__main__':
-    pass 
+    a = cal_influence_index("1768689877")
+    
+    
