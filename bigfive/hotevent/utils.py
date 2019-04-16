@@ -118,7 +118,7 @@ def get_geo(event_id,geo,s, e):
     geo_dic = {}
     for hit in hits:
         item = hit['_source']
-        geo_list = item['geo'].replace('市','').replace('省','').replace('自治区','').split('&')
+        geo_list = item['geo'].replace('市', '').replace('省', '').replace('壮', '').replace('回', '').replace('维吾尔','').replace('族','').replace('自治区', '').split('&')
         if len(geo_list) == 1:
             continue
         if len(geo_list) > 1 and geo == '中国':
@@ -154,7 +154,6 @@ def get_geo(event_id,geo,s, e):
     if geo == '中国':
         geo_dic.update({'国外': abroad_count})
     result= {'city':geo_dic,'rank':[]}
-    del result['city']['广西']
     result['rank'] = [{i[0]:i[1]} for i in sorted(geo_dic.items(), key=lambda x: x[1], reverse=True)[:15]]
     return result
 
@@ -168,7 +167,7 @@ def get_emotion_geo(event_id,emotion,geo):
         geo_dict = item['geo_dict']
         for geo_item in geo_dict:
             count = geo_item['count']
-            geo_list = geo_item['geo'].replace('市','').replace('省','').replace('自治区','').split('&')
+            geo_list = geo_item['geo'].replace('市','').replace('省','').replace('壮', '').replace('回', '').replace('维吾尔','').replace('族','').replace('自治区','').split('&')
             if len(geo_list) == 1:
                 continue
             if len(geo_list) > 1 and geo == '中国':
