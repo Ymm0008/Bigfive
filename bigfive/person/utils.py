@@ -105,27 +105,35 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
 
         if machiavellianism_index:
             if machiavellianism_rank[0] <= item['_source']['machiavellianism_index'] < machiavellianism_rank[1]:
+                del item
                 continue
         if narcissism_index:
             if narcissism_rank[0] <= item['_source']['narcissism_index'] < narcissism_rank[1]:
+                del item
                 continue
         if psychopathy_index:
             if psychopathy_rank[0] <= item['_source']['psychopathy_index'] < psychopathy_rank[1]:
+                del item
                 continue
         if extroversion_index:
             if extroversion_rank[0] <= item['_source']['extroversion_index'] < extroversion_rank[1]:
+                del item
                 continue
         if nervousness_index:
             if nervousness_rank[0] <= item['_source']['nervousness_index'] < nervousness_rank[1]:
+                del item
                 continue
         if openn_index:
             if openn_rank[0] <= item['_source']['openn_index'] < openn_rank[1]:
+                del item
                 continue
         if agreeableness_index:
             if agreeableness_rank[0] <= item['_source']['agreeableness_index'] < agreeableness_rank[1]:
+                del item
                 continue
         if conscientiousness_index:
             if conscientiousness_rank[0] <= item['_source']['conscientiousness_index'] < conscientiousness_rank[1]:
+                del item
                 continue
 
         if item['_source']['extroversion_label'] == 0:
