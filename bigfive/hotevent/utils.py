@@ -109,10 +109,10 @@ def get_geo(event_id,geo,s, e):
         s = get_before_date(30)
     st = date2ts(s)
     et = date2ts(e)+86399
-    abroad_count = es.search(index='event_'+event_id, doc_type='text', body={'query': {'bool': {'must': [], 'must_not': [{'terms': {'geo': ['中国', '局域网', '其他']}}]}}, 'from': 0, 'size': 0})['hits']['total']
-    query = {"query": {"bool": {"must": [{"wildcard": {"geo": "*{}*".format(geo)}}, {"range": {"timestamp": {"gte": st, "lte": et}}}], "must_not": [], "should": []}}, "from": 0, "size": 1000000, "sort": [], "aggs": {}}
-    hits = es.search(index='event_'+event_id,
-                     doc_type='text', body=query,_source_include=['geo'])['hits']['hits']
+    abroad_count = es.search(index='event_geo', doc_type='text', body={'query': {'bool': {'must': [{'term': {'event_id': event_id}}], 'must_not': [{'terms': {'geo': ['中国', '局域网', '其他']}}]}}, 'from': 0, 'size': 0})['hits']['total']
+    query = {"query": {"bool": {"must": [{'term': {'event_id': event_id}}, {"wildcard": {"geo": "*{}*".format(geo)}}, {"range": {"timestamp": {"gte": st, "lte": et}}}], "must_not": [], "should": []}}, "from": 0, "size": 1000000, "sort": [], "aggs": {}}
+    hits = es.search(index='event_geo',
+                     doc_type='text', body=query,_source_include=['geo,geo_count'])['hits']['hits']
     if not hits:
         return {}
     geo_dic = {}
@@ -147,9 +147,9 @@ def get_geo(event_id,geo,s, e):
         if city == '中国':
             continue
         if city not in geo_dic:
-            geo_dic.update({city: 1})
+            geo_dic.update({city: item['geo_count']})
         else:
-            geo_dic[city] += 1
+            geo_dic[city] += item['geo_count']
     # 通过省条数排名
     if geo == '中国':
         geo_dic.update({'国外': abroad_count})
