@@ -42,14 +42,14 @@ def portrait_table(keyword, page, size, order_name, order_type, machiavellianism
     order_type = order_type if order_type else 'desc'
     sort_list.append({order_name: {"order": order_type}})
 
-    machiavellianism_index = machiavellianism_index if machiavellianism_index != '' else 0
-    narcissism_index = narcissism_index if narcissism_index != '' else 0
-    psychopathy_index = psychopathy_index if psychopathy_index != '' else 0
-    extroversion_index = extroversion_index if extroversion_index != '' else 0
-    nervousness_index = nervousness_index if nervousness_index != '' else 0
-    openn_index = openn_index if openn_index != '' else 0
-    agreeableness_index = agreeableness_index if agreeableness_index != '' else 0
-    conscientiousness_index = conscientiousness_index if conscientiousness_index != '' else 0
+    # machiavellianism_index = machiavellianism_index if machiavellianism_index != '' else 0
+    # narcissism_index = narcissism_index if narcissism_index != '' else 0
+    # psychopathy_index = psychopathy_index if psychopathy_index != '' else 0
+    # extroversion_index = extroversion_index if extroversion_index != '' else 0
+    # nervousness_index = nervousness_index if nervousness_index != '' else 0
+    # openn_index = openn_index if openn_index != '' else 0
+    # agreeableness_index = agreeableness_index if agreeableness_index != '' else 0
+    # conscientiousness_index = conscientiousness_index if conscientiousness_index != '' else 0
 
     machiavellianism_rank = index_to_score_rank(machiavellianism_index)
     narcissism_rank = index_to_score_rank(narcissism_index)
