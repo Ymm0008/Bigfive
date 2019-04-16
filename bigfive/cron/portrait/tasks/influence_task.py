@@ -76,26 +76,32 @@ def daily_user_influence_only(date):
             cal_user_influence(uid,weibo_data_dict)
 
 def multi_daily_user_influence(date):    #从Redis取出任务逐个计算
-    date = ts2date(int(date2ts(date)) - DAY)
-    uid = redis_r.rpop('influence_task_%s' % date)
-    weibo_data_dict = get_weibo_data_dict(uid, date,date)
-    cal_user_influence(uid,weibo_data_dict)
+    while True:
+        uid = redis_r.rpop('influence_task_%s' % date)
+        if uid == None:
+            break
+        uid = uid.decode('utf-8')   #redis存的是utf-8类型，Python3要解码一下
+        print(uid, date)
+        weibo_data_dict = get_weibo_data_dict(uid, date,date)
+        cal_user_influence(uid,weibo_data_dict)
 
-
-def multi_main(date):
+def multi_main_influence(date):
     #任务推入redis
+    date = ts2date(int(date2ts(date)) - DAY)   #注意这里的取昨天的操作，算历史别算错了
     redis_r.delete('influence_task_%s' % date)
-    user_generator = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    user_generator = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 100000)
     for res in user_generator:
         userlist = [i['_source']['uid'] for i in res]
         redis_r.lpush('influence_task_%s' % date, *userlist)
+    print('influence task is set...')
 
     #多进程计算加快速度
-    p = Pool(5)
-    for i in range(5):
+    p = Pool(8)
+    for i in range(8):
         p.apply_async(multi_daily_user_influence, args=(date,))
     p.close()
     p.join()   #主进程推动子进程，如果不加join主进程很快结束，子进程也无法进行，join会让主进程一直等待子进程
+    print('calculate over...')
 
     # start_date = ts2date(int(date2ts(date)) - 15*DAY)
     # normalize_influence_index(start_date,date,15)
@@ -142,4 +148,6 @@ if __name__ == '__main__':
     # print('Calculating user influence...')
     # daily_user_influence(theday)
     # multi_main('2019-03-30')
-    multi_test()
+    # multi_test()
+    date = '2019-03-31'
+    multi_main_influence(date)
