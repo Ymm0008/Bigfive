@@ -326,7 +326,7 @@ def run_cal_user(uid_list, start_date, end_date):
                     "uid":uid_list
                 }}]
             }},
-        "size":10000   #因为速度原因只能先计算一万
+        "size":1000   #因为速度原因只能先计算一千
     }
     result_weibo = es_weibo.search(index=es_index_list, doc_type="text", body=query_body)["hits"]["hits"]
     print(len(result_weibo))
@@ -374,7 +374,7 @@ def get_infludece_index():
         else:
             lte_time = date2ts(today)
 
-        if lte_time > today:   #如果在五分钟内算完了五分钟的数据则等待30秒直到到了下个五分钟
+        if lte_time > date2ts(today):   #如果在五分钟内算完了五分钟的数据则等待30秒直到到了下个五分钟
             time.sleep(30)
         else:
             run_cal(today,lte_time)

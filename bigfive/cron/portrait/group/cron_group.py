@@ -15,10 +15,10 @@ def group_portrait(group_id, uid_list, start_date, end_date):
     group_activity(group_id, uid_list, start_date, end_date)
 
     print('Calculating user domain and topic...')
-    domain_topic_static(group_id, uid_list, end_date)
+    domain_topic_static(group_id, uid_list, end_date)   #取所有最近有的数据
     
     print('Calculating word analysis...')
-    group_word_static(group_id, uid_list, end_date)
+    group_word_static(group_id, uid_list, end_date)   #取所有最近有的数据
 
     print('Calculating group attribute...')
     group_attribute_long(group_id, uid_list, start_date, end_date)

@@ -205,8 +205,8 @@ def get_group_user_list(gid, page, size, order_name, order_type):
 
     sort_list = []
     order_name = 'username' if order_name == 'name' else order_name
-    order_name = order_name if order_name else 'username'
-    order_type = order_type if order_type else 'asc'
+    order_name = order_name if order_name else 'influence_index'
+    order_type = order_type if order_type else 'desc'
     sort_list.append({order_name: {"order": order_type}})
 
     user_ranking_query['from'] = str((int(page) - 1) * int(size))

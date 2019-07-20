@@ -32,25 +32,30 @@ def domain_topic_static(group_id,userlist,date):
 
     for uid in userlist:
         query_body = {
-                        "query": {
-                            "bool": {
-                                "must": [
-                                    {
-                                    "term": {
-                                    "uid": uid
-                                    }
-                                    },
-                                    {
-                                    "term": {
-                                    "timestamp": timestamp
-                                    }
-                                    }
-                                ],
-                        "must_not": [ ],
-                        "should": [ ]
-                        }
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "term": {
+                    "uid": uid
+                  }
+                },
+                {
+                  "range": {
+                    "timestamp": {
+                      "lte": timestamp
                     }
+                  }
                 }
+              ]
+            }
+          },
+          "sort": {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        }
         es_result = es.search(index = USER_DOMAIN_TOPIC, doc_type = "text",body = query_body)["hits"]["hits"]
         
         ##########domain and topic
@@ -78,8 +83,8 @@ def domain_topic_static(group_id,userlist,date):
             #     elif j=="social-security":
             #         topic_dict[j] += es_result[0]["_source"]["topic_social_security"]
         else:
-                domain_dict["other"] += 1
-                topic_dict["life"] += 1
+            domain_dict["other"] += 1
+            topic_dict["life"] += 1
 
 
     for domain in domain_dict:
@@ -104,25 +109,30 @@ def group_word_static(group_id,userlist,date):
 
     for uid in userlist:
         query_body = {
-                        "query": {
-                            "bool": {
-                                "must": [
-                                    {
-                                    "term": {
-                                    "uid": uid
-                                    }
-                                    },
-                                    {
-                                    "term": {
-                                    "timestamp": timestamp
-                                    }
-                                    }
-                                ],
-                        "must_not": [ ],
-                        "should": [ ]
-                        }
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "term": {
+                    "uid": uid
+                  }
+                },
+                {
+                  "range": {
+                    "timestamp": {
+                      "lte": timestamp
                     }
+                  }
                 }
+              ]
+            }
+          },
+          "sort": {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        }
         es_result = es.search(index = USER_TEXT_ANALYSIS_STA, doc_type="text",body=query_body)["hits"]["hits"]
         if es_result != []:
             for i in es_result[0]["_source"]["hastags"]:

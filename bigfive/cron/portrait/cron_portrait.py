@@ -20,7 +20,7 @@ def user_ranking(uid_list,push_status_list,username_list,date):
     #最新人格获取，只有最近计算好但还没有被推入主表的人才拿到人格
     query_id_list = [uid + '_' + str(date2ts(date)) for uid in uid_list]
     res = es.mget(index=USER_PERSONALITY, doc_type='text', body={'ids':query_id_list})['docs']
-    personality_dic = {i['_source']['uid']:i['_source'] for i in res in i['found']}
+    personality_dic = {i['_source']['uid']:i['_source'] for i in res if i['found']}
 
     # 最新影响力获取
     res = es.mget(index=USER_INFLUENCE, doc_type='text', body={'ids':query_id_list})['docs']
@@ -225,8 +225,6 @@ def group_create(args_dict, keywords, remark, group_name, create_time, start_dat
         for date in date_list:
             print(date)
             weibo_index = 'flow_text_%s' % date
-            if not es.indices.exists(index = weibo_index):
-                continue
             weibo_generator = get_weibo_generator(weibo_index, weibo_query_body, USER_WEIBO_ITER_COUNT)
             for res in weibo_generator:
                 uid_list_keyword.extend([hit['_source']['uid'] for hit in res])

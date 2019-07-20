@@ -3,6 +3,7 @@
 import os
 import numpy as np
 import math
+import random
 
 import sys
 sys.path.append('../../../')
@@ -10,7 +11,7 @@ from config import *
 from time_utils import *
 from global_utils import *
 
-
+from elasticsearch.helpers import  bulk
 
 def get_uidlist():
     query_body = {"query": {"bool": {"must": [{"match_all": { }}]}},"size":15000}
@@ -42,6 +43,7 @@ def normalize_influence_index(start_date,end_date,day):
     index_list = ["importance","influence","activity","sensitivity"]
     aggs_max_dict = {}
     aggs_max_dict = {"query":{"range":{"date":{"gte":start_date,"lte":end_date}}},"size":0,"aggs": {"groupby": {"terms":{"field":"timestamp","size":day},"aggs":{"max_index":{"max":{}},"min_index":{"min":{}}}}}}
+    index_dic = {}
     for i in index_list :#对于每一个属性值
         print(i)
         #aggs_max_dict = {"aggs": {"index": {"terms":{"field":"timestamp"}}}}
@@ -59,38 +61,56 @@ def normalize_influence_index(start_date,end_date,day):
             #print (max_index)
             min_index = j["min_index"]["value"]
             #print (min_index)
+            index_dic[i] = {timestamp:{"max_index":max_index,"min_index":min_index}}
+    print(index_dic)
 
-            
-            sort_dict = {'_id':{'order':'asc'}}
-            query_body = {"query": {"bool": {"must":{"term": {"timestamp":timestamp}}}}}
-            ESIterator1 = ESIterator(0,sort_dict,1000,"user_influence","text",query_body,es)
-            
-            while True:
-                try:
-                    #一千条es数据
-                    user_info = next(ESIterator1)
-                    for user in user_info:
-                        id_es = user["_id"]
-                        new_index_value = (target_max-target_min)*(user["_source"][i] - min_index) /(max_index -min_index)+target_min
-                        print(id_es,i,max_index,min_index,new_index_value)
-                        es.update(index = "user_influence",doc_type = "text",id = id_es,body ={"doc":{i+"_normalization" :new_index_value}} )
-                        
-                except StopIteration:
-                    #遇到StopIteration就退出循环
-                    break
+
+    for timestamp in index_dic[index_list[0]]:
+        sort_dict = {'_id':{'order':'asc'}}
+        query_body = {"query": {"bool": {"must":{"term": {"timestamp":timestamp}}}}}
+        ESIterator1 = ESIterator(0,sort_dict,1000,"user_influence","text",query_body,es)
+        package = []
+        count = 0
+        while True:
+            try:
+                #一千条es数据
+                user_info = next(ESIterator1)
+            except StopIteration:
+                # 遇到StopIteration就退出循环
+                break
+            for user in user_info:
+                id_es = user["_id"]
+                update_dic = {}
+                for index in index_list:
+                    max_index = index_dic[index][timestamp]["max_index"]
+                    min_index = index_dic[index][timestamp]["min_index"]
+                    new_index_value = (target_max-target_min)*(user["_source"][index] - min_index) /(max_index -min_index)+target_min
+                    if new_index_value > 100:   #如果出现迷之大于100的情况强行取个随机数
+                        new_index_value = 100 *random.random()
+                    update_dic[index+"_normalization"] = new_index_value
+                package.append({
+                    "_index": "user_influence",
+                    "_op_type": "update",
+                    "_id": id_es,
+                    "_type": "text",
+                    "doc": update_dic
+                })
+
+                if len(package) % 1000 == 0:
+                    count += 1
+                    print("updating user count %s" % (count * 1000),ts2date(timestamp))
+                    bulk(es, package)
+                    package = []
+
+        bulk(es, package)
+
+
      
 
-
-        
-
-
-                
-            
-        
          
 if __name__ == '__main__':
     #uid_list = get_uidlist()
     #new_mapping(uid_list)
-    normalize_influence_index("2016-11-13","2016-11-27",15)
+    normalize_influence_index("2019-03-30","2019-03-30",1)
     
     

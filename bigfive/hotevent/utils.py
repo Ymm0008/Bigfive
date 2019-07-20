@@ -403,25 +403,6 @@ def get_in_group_ranking(event_id,mtype):
 def get_network(event_id):
     result = {'important_users_list': []}
     important_users_list = es.get(index='event_information', doc_type='text', id=event_id)['_source']['userlist_important']
-    query_body = {
-        "query": {
-            "filtered": {
-                "filter": {
-                    "bool": {
-                        "must": [
-                            {
-                                "terms": {
-                                    "uid": important_users_list
-                                }
-                            }
-                        ]}
-                }}
-        },
-        "size": 5,
-    }
-
-    user_item = es.search(index='user_information', doc_type='text', body=query_body)['hits']['hits']
-    result['important_users_list'] += [user['_source'] for user in user_item]
 
     message_type = 3
     key = 'target'
@@ -456,19 +437,56 @@ def get_network(event_id):
                   body=query_body)["hits"]["hits"]
     node = []
     link = []
+    nodedic = {}
     for one in r:
         item = one['_source']
         a = {'id': item['target'], 'name': item['target_name']}
         b = {'id': item['source'], 'name': item['source_name']}
         c = {'source': item['source_name'], 'target': item['target_name']}
+
         if c not in link and c['source'] != c['target']:
             link.append(c)
+
+            if item['source'] in nodedic:
+                nodedic[item['source']] += 1
+            else:
+                nodedic[item['source']] = 1
+            if item['target'] in nodedic:
+                nodedic[item['target']] += 1
+            else:
+                nodedic[item['target']] = 1
+
             if a not in node:
                 node.append(a)
             if b not in node:
                 node.append(b)
     transmit_net = {'node': list(node), 'link': link}
     result['transmit_net'] = transmit_net
+
+    nodedic_sorted = sorted(nodedic.items(), key=lambda x:x[1], reverse=True)
+    important_users_list = [i[0] for i in nodedic_sorted[:5]]
+    query_body = {
+        "query": {
+            "filtered": {
+                "filter": {
+                    "bool": {
+                        "must": [
+                            {
+                                "terms": {
+                                    "uid": important_users_list
+                                }
+                            }
+                        ]}
+                }}
+        },
+        "size": 5,
+    }
+
+    user_item = es.search(index='user_information', doc_type='text', body=query_body)['hits']['hits']
+    user_item_dic = {i['_source']['uid']:i['_source'] for i in user_item}
+
+    result['important_users_list'] += [user_item_dic[uid] for uid in important_users_list]
+
     return result
 
 

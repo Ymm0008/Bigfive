@@ -38,8 +38,6 @@ def politics_create(politics_mapping_name, keywords, start_date, end_date):
     for date in date_list:
         print(date)
         weibo_index = 'flow_text_%s' % date
-        if not es.indices.exists(index = weibo_index):
-            continue
         weibo_generator = get_weibo_generator(weibo_index, weibo_query_body, USER_WEIBO_ITER_COUNT)
         package = []
         midlist = []

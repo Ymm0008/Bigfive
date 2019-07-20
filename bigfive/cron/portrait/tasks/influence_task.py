@@ -11,6 +11,7 @@ from global_utils import *
 from portrait.cron_portrait import user_ranking
 from user.user_influence import cal_user_influence
 from user.cron_user import get_weibo_data_dict
+from user.normalizing import normalize_influence_index
 
 def daily_user_influence(date):
     date = ts2date(int(date2ts(date)) - DAY)
@@ -44,9 +45,14 @@ def daily_user_influence(date):
             break
         uid_ranking_list = []
         username_ranking_list = []
+        push_status_list = []
         for k,v in enumerate(ranking_result):
             uid_ranking_list.append(ranking_result[k]["_source"]["uid"])
-            username_ranking_list.append(ranking_result[k]["_source"]["username"])
+            try:
+                username_ranking_list.append(ranking_result[k]["_source"]["username"])
+            except:
+                username_ranking_list.append("")
+            push_status_list.append(ranking_result[k]["_source"]["push_status"])
         user_ranking(uid_ranking_list, username_ranking_list, date)
 
 def daily_user_influence_only(date):

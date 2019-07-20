@@ -5,9 +5,9 @@ import time
 
 from flask import Blueprint, request, jsonify
 from datetime import datetime, timedelta
+from bigfive.time_utils import *
 
-from bigfive.person.utils import es, user_emotion, user_social_contact, user_preference, portrait_table, \
-    delete_by_id, get_influence_feature, get_user_activity, get_preference_identity, get_basic_info,get_user_behavior
+from bigfive.person.utils import *
 
 mod = Blueprint('person', __name__, url_prefix='/person')
 
@@ -248,4 +248,35 @@ def emotion_feature():
     uid = request.args.get('person_id')
     interval = request.args.get('type','day')
     result = user_emotion(uid,interval)
+    return jsonify(result)
+
+@mod.route('/user_add_one', methods=['POST', 'GET'])
+def user_add_one():
+    username = request.args.get('username')
+    uid = request.args.get('uid')
+    gender = request.args.get('gender')
+    description = request.args.get('description')
+    user_location = request.args.get('user_location')
+    friends_num = request.args.get('friends_num')
+    create_at = request.args.get('create_at')
+    weibo_num = request.args.get('weibo_num')
+    user_birth = request.args.get('user_birth')
+    isreal = request.args.get('isreal')
+    photo_url = request.args.get('photo_url')
+    fans_num = request.args.get('fans_num')
+    insert_time = int(time.time())
+    progress = 0
+
+    result = user_add_one_task(username, uid, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, insert_time, progress)
+    return jsonify(result)
+
+@mod.route('/user_task_show', methods=['POST', 'GET'])
+def user_task_show():
+    result = get_user_task_show()
+    return jsonify(result)
+
+@mod.route('/user_task_delete', methods=['POST', 'GET'])
+def user_task_delete():
+    uid = request.args.get('uid')
+    result = delete_user_task(uid)
     return jsonify(result)

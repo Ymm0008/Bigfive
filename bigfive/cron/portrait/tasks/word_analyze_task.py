@@ -8,7 +8,7 @@ import datetime
 from config import *
 from time_utils import *
 from global_utils import *
-from user.user_text_analyze import cal_user_text_analyze
+from user.user_text_analyze import get_word_analysis
 
 def weekly_user_text_analyze(date):
     date = ts2date(int(date2ts(date)) - DAY)
@@ -22,8 +22,8 @@ def weekly_user_text_analyze(date):
         uid_list = []
         for k,v in enumerate(es_result):
             uid_list.append(es_result[k]["_source"]["uid"])
-
-        cal_user_text_analyze(uid_list, date, date)
+        for uid in uid_list:
+            get_word_analysis(uid, date, date)
 
 
 if __name__ == '__main__':
@@ -35,8 +35,9 @@ if __name__ == '__main__':
     if weekday == 4:
         print("Calculating user text keywords...")
         weekly_user_text_analyze(theday)
-    else: 
+    else:
         print("not reach calculating user text keywords time")
         pass
-    # theday = today()
-    # weekly_user_text_analyze(theday)
+
+    # theday = '2019-04-10'
+    # weekly_user_text_analyze(theday)))

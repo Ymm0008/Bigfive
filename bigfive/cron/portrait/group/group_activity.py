@@ -69,6 +69,8 @@ def group_activity(group_id, uid_list, start_date, end_date):
             geo = hit['geo'].replace('&',' ')
             #对于前后两天位置不同的认为是发生了位置改变
             if last_geo != geo:
+                if not (len(last_geo) & len(geo)):
+                    continue
                 geo2geo = last_geo + '&' + geo
                 try:
                     activity_direction[geo2geo] += 1

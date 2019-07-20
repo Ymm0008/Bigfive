@@ -44,7 +44,7 @@ def user_main(uid_list, username_list, start_date, end_date):
 
 #检测任务表，有新任务会进行计算，默认取计算时间段的结束日期为创建日期，开始日期为结束日期前的n天
 def group_main(args_dict, keyword, remark, group_name, create_time):
-    days = 15
+    days = 15   #注意，取得15天的事件限制算的画像
     end_date = ts2date(create_time)
     start_date = ts2date(create_time - days * 24 *3600)
     print('Start finding userlist...')

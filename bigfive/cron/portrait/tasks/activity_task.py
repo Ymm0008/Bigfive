@@ -39,7 +39,7 @@ from user.cron_user import get_weibo_data_dict
 def daily_user_activity(date):
     date = ts2date(int(date2ts(date)) - DAY)
     print(date)
-    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 100000)
     while True:
         try:
             es_result = next(iter_result)

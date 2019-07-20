@@ -6,9 +6,9 @@ import time
 
 from elasticsearch.helpers import scan
 
-from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO
+from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO, USER_INFORMATION
 from bigfive.cache import cache
-from bigfive.time_utils import yesterday, datetime2ts, ts2datetime
+from bigfive.time_utils import yesterday, datetime2ts, ts2datetime, date2ts, ts2date
 
 
 def judge_uid_or_nickname(keyword):
@@ -634,6 +634,9 @@ def get_user_activity(uid):
             one_week_geo_rank.append({'rank': i + 1, 'count': '-', 'geo': '-'})
         route_list = []
 
+    for item in route_list:
+        if not (item['s'] and item['e']):
+            route_list.remove(item)
     result['one_day_ip_rank'] = one_day_ip_rank
     result['one_day_geo_rank'] = one_day_geo_rank
     result['one_week_ip_rank'] = one_week_ip_rank
@@ -972,3 +975,125 @@ def user_preference(user_uid):
     es_result = es.search(index="user_preference", doc_type="text", body=query_body)["hits"]["hits"][
         0]  # 默认取第0条一个用户的最新一条
     return es_result
+
+def user_add_one_task(username, uid, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, insert_time, progress):
+    try:
+        gender = int(gender)
+        if gender not in [0,1]:
+            gender_check = 0
+        else:
+            gender_check = 1
+    except:
+        gender_check = 0
+    try:
+        isreal = int(isreal)
+        if isreal not in [0,1]:
+            isreal_check = 0
+        else:
+            isreal_check = 1
+    except:
+        isreal_check = 0
+    try:
+        friends_num = int(friends_num)
+        if friends_num < 0:
+            friends_num_check = 0
+        else:
+            friends_num_check = 1
+    except:
+        friends_num_check = 0
+    try:
+        weibo_num = int(weibo_num)
+        if weibo_num < 0:
+            weibo_num_check = 0
+        else:
+            weibo_num_check = 1
+    except:
+        weibo_num_check = 0
+    try:
+        fans_num = int(fans_num)
+        if fans_num < 0:
+            fans_num_check = 0
+        else:
+            fans_num_check = 1
+    except:
+        fans_num_check = 0
+    try:
+        create_at = date2ts(create_at)
+        create_at_check = 1
+    except:
+        create_at_check = 0
+
+    if not gender_check:
+        return {'status':0, 'info':'错误的性别输入'}
+    if not isreal_check:
+        return {'status':0, 'info':'错误的实名认证输入'}
+    if not friends_num_check:
+        return {'status':0, 'info':'错误的关注数输入'}
+    if not weibo_num_check:
+        return {'status':0, 'info':'错误的微博数输入'}
+    if not fans_num_check:
+        return {'status':0, 'info':'错误的粉丝数输入'}
+    if not create_at_check:
+        return {'status':0, 'info':'错误的创建时间输入'}
+
+    try:
+        es.get(index=USER_INFORMATION, doc_type='text', id=uid)
+        return {'status':0, 'info':'用户已在库中'}
+    except:
+        pass
+    dic = {
+        'username': username,
+        'uid': uid,
+        'gender': gender,
+        'description': description,
+        'user_location': user_location,
+        'friends_num': friends_num,
+        'create_at': create_at,
+        'weibo_num': weibo_num,
+        'user_birth': user_birth,
+        'isreal': isreal,
+        'photo_url': photo_url,
+        'fans_num': fans_num,
+        'insert_time': insert_time,
+        'progress': progress,
+    }
+
+    es.index(index=USER_INFORMATION, doc_type='text', id=uid, body=dic)
+    return {'status':1, 'info':'成功插入用户，等待计算'}
+
+def get_user_task_show():
+    query_body = {
+        'query':{
+            'terms':{
+                'progress':[0, 1]
+            }
+        },
+        'sort':{
+            'insert_time':{
+                'order':'asc'
+            }
+        },
+        'size':10000
+    }
+    res = es.search(index=USER_INFORMATION,doc_type='text',body=query_body)['hits']['hits']
+    result = []
+    for hit in res:
+        dic = {}
+        dic['username'] = hit['_source']['username']
+        dic['uid'] = hit['_source']['uid']
+        dic['create_at'] = ts2date(hit['_source']['create_at'])
+        dic['progress'] = hit['_source']['progress']
+        result.append(dic)
+
+    return result
+
+def delete_user_task(uid):
+    try:
+        data = es.get(index=USER_INFORMATION, doc_type='text', id=uid)
+        if data['_source']['progress'] == 0:
+            es.delete(index=USER_INFORMATION, doc_type='text', id=uid)
+            return {'status':1, 'info':'删除成功'}
+        else:
+            return {'status':0, 'info':'删除失败，用户正在计算或已计算完成，请在对应页面删除'}
+    except:
+        return {'status':0, 'info':'删除失败，用户不在库中'}
