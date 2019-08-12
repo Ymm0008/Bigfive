@@ -3,7 +3,7 @@
 import json
 import time
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response, send_file
 from datetime import datetime, timedelta
 from bigfive.time_utils import *
 
@@ -270,6 +270,12 @@ def user_add_one():
     result = user_add_one_task(username, uid, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, insert_time, progress)
     return jsonify(result)
 
+@mod.route('/user_add_list', methods=['POST', 'GET'])
+def user_add_list():
+    task_list = json.loads(request.args.get('list'))
+    result = user_add_list_task(task_list)
+    return jsonify(result)
+
 @mod.route('/user_task_show', methods=['POST', 'GET'])
 def user_task_show():
     result = get_user_task_show()
@@ -280,3 +286,19 @@ def user_task_delete():
     uid = request.args.get('uid')
     result = delete_user_task(uid)
     return jsonify(result)
+
+@mod.route('/user_info_download', methods=['POST', 'GET'])
+def user_info_download():
+    uids = request.args.get('person_id')
+    timenow = ts2datetime(int(time.time()))
+    filename = 'outfile/' + timenow + '.xlsx'
+    uidlist = uids.split(',')
+    get_user_excel_info(uidlist, filename)
+    try:
+        response = make_response(send_file(filename, as_attachment=True, attachment_filename="%s.xlsx" % timenow))
+        ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+        os.remove(ABS_PATH + '/../' + filename)
+    except Exception as e:
+        print(e)
+        return json.dumps({"status":0})
+    return response
