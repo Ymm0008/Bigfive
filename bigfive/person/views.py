@@ -270,9 +270,10 @@ def user_add_one():
     result = user_add_one_task(username, uid, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, insert_time, progress)
     return jsonify(result)
 
-@mod.route('/user_add_list', methods=['POST', 'GET'])
+@mod.route('/user_add_list', methods=['POST'])
 def user_add_list():
-    task_list = json.loads(request.args.get('list'))
+	parameters = request.form.to_dict()
+	task_list = json.loads(parameters.get('list', "[]"))
     result = user_add_list_task(task_list)
     return jsonify(result)
 
