@@ -81,7 +81,7 @@ PERSONALITY_DIC = {
     'extroversion_index':{'name':'外倾性','threshold':USER_EXTROVERSION_THRESHOLD},
     'nervousness_index':{'name':'神经质','threshold':USER_NERVOUSNESS_THRESHOLD},
     'openn_index':{'name':'开放性','threshold':USER_OPENN_THRESHOLD},
-    'agreeableness_index':{'name':'开放性','threshold':USER_AGREEABLENESS_THRESHOLD},
+    'agreeableness_index':{'name':'宜人性','threshold':USER_AGREEABLENESS_THRESHOLD},
     'conscientiousness_index':{'name':'尽责性','threshold':USER_CONSCIENTIOUSNESS_THRESHOLD}
 }
 PERSONALITY_EN_CH = {
@@ -91,7 +91,7 @@ PERSONALITY_EN_CH = {
     'extroversion':'外倾性',
     'nervousness':'神经质',
     'openn':'开放性',
-    'agreeableness':'开放性',
+    'agreeableness':'宜人性',
     'conscientiousness':'尽责性'
 }
 PERSONALITY_LABEL_LIST=["machiavellianism_label","narcissism_label","psychopathy_label","extroversion_label",\
@@ -133,6 +133,8 @@ topic_dict = {'art': '文体类_娱乐', 'computer': '科技类', 'economic': '�
               'life': '其他类', 'anti_corruption': '政治类_反腐', 'employment': '民生类_就业', 'fear_of_violence': '政治类_暴恐',
               'house': '民生类_住房', 'law': '民生类_法律', 'peace': '政治类_地区和平', 'religion': '政治类_宗教',
               'social_security': '民生类_社会保障', 'violence': '政治类_暴恐',}
+progress_dict = {0:"未计算",1:"计算中",2:"计算完成"}
+index_label_dict = {0:"低",1:"中",2:"高"}
 
 outlist = [u'海外', u'香港', u'台湾', u'澳门']
 lawyerw = [u'律师', u'法律', u'法务', u'辩护']
@@ -140,6 +142,7 @@ STATUS_THRE = 4000
 FOLLOWER_THRE = 1000
 #政治倾向
 POLITICAL_LABELS = ['left','right','mid']
+political_bias_dict = {'left': '左倾', 'mid': '中立', 'right': '右倾'}
 LEFT_STA = 6000
 RIGHT_STA = 3000
 

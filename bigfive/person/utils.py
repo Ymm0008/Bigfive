@@ -2,11 +2,13 @@
 
 import json
 import re
+import os
 import time
+import xlsxwriter
 
 from elasticsearch.helpers import scan
 
-from bigfive.config import es, labels_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO, USER_INFORMATION
+from bigfive.config import es, labels_dict, progress_dict, index_label_dict, political_bias_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO, USER_INFORMATION
 from bigfive.cache import cache
 from bigfive.time_utils import yesterday, datetime2ts, ts2datetime, date2ts, ts2date
 
@@ -984,7 +986,11 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
         else:
             gender_check = 1
     except:
-        gender_check = 0
+        if gender == '':
+            gender_check = 1
+            gender = 1
+        else:
+            gender_check = 0
     try:
         isreal = int(isreal)
         if isreal not in [0,1]:
@@ -992,7 +998,11 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
         else:
             isreal_check = 1
     except:
-        isreal_check = 0
+        if isreal == '':
+            isreal_check = 1
+            isreal = 0
+        else:
+            isreal_check = 0
     try:
         friends_num = int(friends_num)
         if friends_num < 0:
@@ -1000,7 +1010,11 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
         else:
             friends_num_check = 1
     except:
-        friends_num_check = 0
+        if friends_num == '':
+            friends_num_check = 1
+            friends_num = 0
+        else:
+            friends_num_check = 0
     try:
         weibo_num = int(weibo_num)
         if weibo_num < 0:
@@ -1008,7 +1022,11 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
         else:
             weibo_num_check = 1
     except:
-        weibo_num_check = 0
+        if weibo_num == '':
+            weibo_num_check = 1
+            weibo_num = 0
+        else:
+            weibo_num_check = 0
     try:
         fans_num = int(fans_num)
         if fans_num < 0:
@@ -1016,12 +1034,20 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
         else:
             fans_num_check = 1
     except:
-        fans_num_check = 0
+        if fans_num == '':
+            fans_num_check = 1
+            fans_num = 0
+        else:
+            fans_num_check = 0
     try:
         create_at = date2ts(create_at)
         create_at_check = 1
     except:
-        create_at_check = 0
+        if create_at == '':
+            create_at_check = 1
+            create_at = 0
+        else:
+            create_at_check = 0
 
     if not gender_check:
         return {'status':0, 'info':'错误的性别输入'}
@@ -1061,6 +1087,38 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
     es.index(index=USER_INFORMATION, doc_type='text', id=uid, body=dic)
     return {'status':1, 'info':'成功插入用户，等待计算'}
 
+def user_add_list_task(task_list):
+    result = {'status':0,'info':''}
+    success_list = []
+    for item in task_list:
+        username = item['username']
+        uid = item['uid']
+        gender = item['gender']
+        description = item['description']
+        user_location = item['user_location']
+        friends_num = item['friends_num']
+        create_at = item['create_at']
+        weibo_num = item['weibo_num']
+        user_birth = item['user_birth']
+        isreal = item['isreal']
+        photo_url = item['photo_url']
+        fans_num = item['fans_num']
+        insert_time = int(time.time())
+        progress = 0
+        status = user_add_one_task(username, uid, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, insert_time, progress)
+        if not status['status']:
+            result['info'] += 'ID“%s”插入失败，原因是“%s”;' % (str(uid),status['info'])
+        else:
+        	success_list.append(str(uid))
+    if len(success_list) and result['info']:
+    	result['info'] = "ID“%s”插入成功;" % ','.join(success_list) + result['info'] 
+
+    if not result['info']:
+        result['status'] = 1
+        result['info'] = '成功插入所有用户，等待计算'
+
+    return result
+
 def get_user_task_show():
     query_body = {
         'query':{
@@ -1097,3 +1155,95 @@ def delete_user_task(uid):
             return {'status':0, 'info':'删除失败，用户正在计算或已计算完成，请在对应页面删除'}
     except:
         return {'status':0, 'info':'删除失败，用户不在库中'}
+
+def get_user_excel_info(uidlist, filename):
+    filename = 'bigfive/' + filename
+    datadic = {}
+    headings = []
+    headings_cn = []
+    # 基本信息
+    data = es.mget(index = USER_INFORMATION,doc_type = 'text', body = {'ids': uidlist})['docs']
+    
+    for index, item in enumerate(data):
+        if item['found']:
+            uid = item['_source']['uid']
+            username = item['_source']['username']
+            gender = '男' if item['_source']['gender'] else '女'
+            description = item['_source']['description']
+            user_location = item['_source']['user_location']
+            friends_num = item['_source']['friends_num']
+            create_at = ts2datetime(item['_source']['create_at'])
+            weibo_num = item['_source']['weibo_num']
+            user_birth = item['_source']['user_birth']
+            isreal = '是' if item['_source']['isreal'] else '否'
+            photo_url = item['_source']['photo_url']
+            fans_num = item['_source']['fans_num']
+            if 'political_bias' in item['_source']:
+            	political_bias = political_bias_dict[item['_source']['political_bias']]
+            else:
+            	political_bias = ''
+            if 'domain' in item['_source']:
+            	domain = labels_dict[item['_source']['domain']]
+            else:
+            	domain = ''
+            insert_time = ts2datetime(item['_source']['insert_time'])
+            progress = progress_dict[item['_source']['progress']]
+            datadic[uid] = [index+1, uid, username, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, political_bias, domain, insert_time, progress]
+        else:
+            datadic[item['_id']] = [index+1, item['_id']]
+            datadic[item['_id']].extend(['未找到该用户基本信息，请检查输入是否正确'] * 15) 
+    # headings.extend(["uid", "username", "gender", "description", "user_location", "friends_num", "create_at", "weibo_num", "user_birth", "isreal", "photo_url", "fans_num", "political_bias", "domain", "insert_time", "progress"])
+    headings_cn.extend(["序号","用户ID","用户名","性别","用户简介","所在地","关注数","创建时间","微博数","出生日期","是否实名","头像链接","粉丝数","政治倾向","用户领域","入库时间","计算状态"])
+
+    # 人格指数
+    data = es.mget(index = USER_RANKING,doc_type = 'text', body = {'ids': uidlist})['docs']
+    for item in data:
+        if item['found']:
+            machiavellianism_index = item['_source']['machiavellianism_index']
+            narcissism_index = item['_source']['narcissism_index']
+            psychopathy_index = item['_source']['psychopathy_index']
+            extroversion_index = item['_source']['extroversion_index']
+            nervousness_index = item['_source']['nervousness_index']
+            openn_index = item['_source']['openn_index']
+            agreeableness_index = item['_source']['agreeableness_index']
+            conscientiousness_index = item['_source']['conscientiousness_index']
+            liveness_index = item['_source']['liveness_index']
+            importance_index = item['_source']['importance_index']
+            sensitive_index = item['_source']['sensitive_index']
+            influence_index = item['_source']['influence_index']
+            liveness_star = item['_source']['liveness_star']
+            importance_star = item['_source']['importance_star']
+            sensitive_star = item['_source']['sensitive_star']
+            influence_star = item['_source']['influence_star']
+            machiavellianism_label = index_label_dict[item['_source']['machiavellianism_label']]
+            narcissism_label = index_label_dict[item['_source']['narcissism_label']]
+            psychopathy_label = index_label_dict[item['_source']['psychopathy_label']]
+            extroversion_label = index_label_dict[item['_source']['extroversion_label']]
+            nervousness_label = index_label_dict[item['_source']['nervousness_label']]
+            openn_label = index_label_dict[item['_source']['openn_label']]
+            agreeableness_label = index_label_dict[item['_source']['agreeableness_label']]
+            conscientiousness_label = index_label_dict[item['_source']['conscientiousness_label']]
+            datadic[item['_source']['uid']].extend([machiavellianism_index, narcissism_index, psychopathy_index, extroversion_index, nervousness_index, openn_index, agreeableness_index, conscientiousness_index, liveness_index, importance_index, sensitive_index, influence_index, liveness_star, importance_star, sensitive_star, influence_star, machiavellianism_label, narcissism_label, psychopathy_label, extroversion_label, nervousness_label, openn_label, agreeableness_label, conscientiousness_label])
+        else:
+            datadic[item['_id']].extend(['未找到该用户人格信息，请检查输入是否正确或该用户是否已经计算'] * 24) 
+    # headings.extend(["machiavellianism_index", "narcissism_index", "psychopathy_index", "extroversion_index", "nervousness_index", "openn_index", "agreeableness_index", "conscientiousness_index", "liveness_index", "importance_index", "sensitive_index", "influence_index", "liveness_star", "importance_star", "sensitive_star", "influence_star", "machiavellianism_label", "narcissism_label", "psychopathy_label", "extroversion_label", "nervousness_label", "openn_label", "agreeableness_label", "conscientiousness_label"])
+    headings_cn.extend(["马基雅维里主义指数","自恋指数","精神病态指数","外倾性指数","神经质指数","开放性指数","宜人性指数","尽责性指数","活跃度","重要度","敏感度","影响力","活跃度星级","重要度星级","敏感度星级","影响力星级","马基雅维里主义标签","自恋标签","精神病态标签","外倾性标签","神经质标签","开放性标签","宜人性标签","尽责性标签"])
+
+    try: 
+        workbook = xlsxwriter.Workbook(filename)     #新建excel表
+        worksheet = workbook.add_worksheet('sheet1')       #新建sheet（sheet的名称为"sheet1"）      
+
+        # worksheet.set_column('A:C', 20)
+        # worksheet.write_row('A1', headings)
+        worksheet.write_row('A1', headings_cn)
+
+        num = 2
+        for uid in datadic:
+            worksheet.write_row('A%d' % num, datadic[uid])
+            num += 1
+        workbook.close()          #将excel文件保存关闭，如果没有这一行运行代码会报错
+        time.sleep(0.5)
+        return {"status":1}
+    except Exception as e:
+        print(e)
+        return {"status":0}
