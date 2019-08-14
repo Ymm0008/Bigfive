@@ -134,8 +134,8 @@ def user_domain_classifier_v2(user):
     location = r['user_location']
     province = location.split(' ')[0]
 
-    followers_count = r['fans_num']
-    statuses_count = r['statusnum']
+    followers_count = int(r['fans_num'])
+    statuses_count = int(r['statusnum'])
 
     name = r['username']
     description = r['description']

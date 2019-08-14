@@ -11,7 +11,7 @@ from cron_portrait import cal_user_personality
 def monthly_user_personality(date):
     date = ts2date(int(date2ts(date)) - DAY)
     print(date)
-    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 1000)
     iter_num = 0
     while True:
         try:

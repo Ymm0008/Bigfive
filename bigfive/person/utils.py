@@ -617,14 +617,17 @@ def get_user_activity(uid):
 
         geo_dict_item = list(geo_dict.items())
         route_list = []
+        geo_dict_item = sorted(geo_dict_item, key=lambda x: x[0])
+        geo_index = 0
         for i in range(len(geo_dict_item)):
             if not geo_dict_item[i][1]:
                 continue
             item = {'s': max(geo_dict_item[i][1], key=geo_dict_item[i][1].get).split('&')[1], 'e': ''}
             route_list.append(item)
-            # print('maxmaxmax', max(geo_dict_item[i][1], key=geo_dict_item[i][1].get))
-            if i > 0:
-                route_list[i - 1]['e'] = max(geo_dict_item[i][1], key=geo_dict_item[i][1].get).split('&')[1]
+            # print('maxmaxmax', max(geo_dict_item[i][1], key=geo_dict_item[i][1].get).split('&')[1])
+            if geo_index > 0:
+                route_list[geo_index - 1]['e'] = max(geo_dict_item[i][1], key=geo_dict_item[i][1].get).split('&')[1]
+            geo_index += 1
 
         if len(route_list) > 1:
             del (route_list[-1])
@@ -716,10 +719,14 @@ def get_preference_identity(uid):
     for k, v in preference_and_topic_data.items():
         if k.startswith('topic_'):
             preference_item[k] = v
+    print(preference_item)
     l = sorted(preference_item.items(), key=lambda x:x[1], reverse=True)[0:5]
     sum_topic = sum([i[1] for i in l])
     for i in range(0,5):
-        topic_result[topic_dict[l[i][0].replace('topic_', '')]] = l[i][1]/sum_topic
+        if sum_topic:
+            topic_result[topic_dict[l[i][0].replace('topic_', '')]] = l[i][1]/sum_topic
+        else:
+            topic_result[topic_dict[l[i][0].replace('topic_', '')]] =  0
     node_main = {'name': labels_dict[preference_and_topic_data['main_domain']], 'id': preference_and_topic_data['uid']}
     node_followers = {'name': labels_dict[preference_and_topic_data['domain_followers']]}
     node_verified = {'name': labels_dict[preference_and_topic_data['domain_verified']]}
@@ -1049,6 +1056,8 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
         else:
             create_at_check = 0
 
+    if not uid:
+        return {'status':0, 'info':'用户uid为必须输入项'}
     if not gender_check:
         return {'status':0, 'info':'错误的性别输入'}
     if not isreal_check:
@@ -1090,28 +1099,66 @@ def user_add_one_task(username, uid, gender, description, user_location, friends
 def user_add_list_task(task_list):
     result = {'status':0,'info':''}
     success_list = []
+    if not len(task_list):
+        return {'status':0,'info':'任务列表为空，请检查输入文件是否正确'}
     for item in task_list:
-        username = item['username']
-        uid = item['uid']
-        gender = item['gender']
-        description = item['description']
-        user_location = item['user_location']
-        friends_num = item['friends_num']
-        create_at = item['create_at']
-        weibo_num = item['weibo_num']
-        user_birth = item['user_birth']
-        isreal = item['isreal']
-        photo_url = item['photo_url']
-        fans_num = item['fans_num']
+        if 'uid' in item:
+            uid = item['uid']
+        else:
+            uid = ''
+        if 'username' in item:
+            username = item['username']
+        else:
+            username = ''
+        if 'gender' in item:
+            gender = 0 if item['gender'] == '女' else 1
+        else:
+            gender = ''
+        if 'description' in item:
+            description = item['description']
+        else:
+            description = ''
+        if 'user_location' in item:
+            user_location = item['user_location']
+        else:
+            user_location = ''
+        if 'friends_num' in item:
+            friends_num = item['friends_num']
+        else:
+            friends_num = ''
+        if 'create_at' in item:
+            create_at = item['create_at']
+        else:
+            create_at = ''
+        if 'weibo_num' in item:
+            weibo_num = item['weibo_num']
+        else:
+            weibo_num = ''
+        if 'user_birth' in item:
+            user_birth = item['user_birth']
+        else:
+            user_birth = ''
+        if 'isreal' in item:
+            isreal = 1 if item['isreal'] == '是' else 0
+        else:
+            isreal = ''
+        if 'photo_url' in item:
+            photo_url = item['photo_url']
+        else:
+            photo_url = ''
+        if 'fans_num' in item:
+            fans_num = item['fans_num']
+        else:
+            fans_num = ''
         insert_time = int(time.time())
         progress = 0
         status = user_add_one_task(username, uid, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, insert_time, progress)
         if not status['status']:
             result['info'] += 'ID“%s”插入失败，原因是“%s”;' % (str(uid),status['info'])
         else:
-        	success_list.append(str(uid))
+            success_list.append(str(uid))
     if len(success_list) and result['info']:
-    	result['info'] = "ID“%s”插入成功;" % ','.join(success_list) + result['info'] 
+        result['info'] = "ID“%s”插入成功;" % ','.join(success_list) + result['info'] 
 
     if not result['info']:
         result['status'] = 1
@@ -1126,11 +1173,10 @@ def get_user_task_show():
                 'progress':[0, 1]
             }
         },
-        'sort':{
-            'insert_time':{
-                'order':'asc'
-            }
-        },
+        'sort':[
+            {'insert_time':{'order':'desc'}},
+            {'progress':{'order':'desc'}},
+        ],
         'size':10000
     }
     res = es.search(index=USER_INFORMATION,doc_type='text',body=query_body)['hits']['hits']
@@ -1139,7 +1185,7 @@ def get_user_task_show():
         dic = {}
         dic['username'] = hit['_source']['username']
         dic['uid'] = hit['_source']['uid']
-        dic['create_at'] = ts2date(hit['_source']['create_at'])
+        dic['create_at'] = ts2datetime(hit['_source']['insert_time'])
         dic['progress'] = hit['_source']['progress']
         result.append(dic)
 
@@ -1179,13 +1225,13 @@ def get_user_excel_info(uidlist, filename):
             photo_url = item['_source']['photo_url']
             fans_num = item['_source']['fans_num']
             if 'political_bias' in item['_source']:
-            	political_bias = political_bias_dict[item['_source']['political_bias']]
+                political_bias = political_bias_dict[item['_source']['political_bias']]
             else:
-            	political_bias = ''
+                political_bias = ''
             if 'domain' in item['_source']:
-            	domain = labels_dict[item['_source']['domain']]
+                domain = labels_dict[item['_source']['domain']]
             else:
-            	domain = ''
+                domain = ''
             insert_time = ts2datetime(item['_source']['insert_time'])
             progress = progress_dict[item['_source']['progress']]
             datadic[uid] = [index+1, uid, username, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, political_bias, domain, insert_time, progress]

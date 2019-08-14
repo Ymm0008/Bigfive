@@ -48,7 +48,7 @@ def multi_main_emotion(date):
     #任务推入redis
     date = ts2date(int(date2ts(date)) - DAY)   #注意这里的取昨天的操作，算历史别算错了
     redis_r.delete('emotion_task_%s' % date)
-    user_generator = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 100000)
+    user_generator = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 100000)
     for res in user_generator:
         userlist = [i['_source']['uid'] for i in res]
         redis_r.lpush('emotion_task_%s' % date, *userlist)
@@ -69,5 +69,9 @@ if __name__ == '__main__':
     # theday = today()
     # print('Calculating user emotion...')
     # daily_user_emotion(theday)
-    date = '2019-04-12'
+    date = today()
     multi_main_emotion(date)
+    #uid = "1878219871"
+    #date = "2019-04-16"
+    #weibo_data_dict = get_weibo_data_dict(uid, date, date)
+    #cal_user_emotion(uid, weibo_data_dict)

@@ -11,7 +11,7 @@ from user.user_ip import get_user_activity
 def daily_user_position(date):
     date = ts2date(int(date2ts(date))-86400)
     print(date)
-    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 1000)
     while True:
         try:
             es_result = next(iter_result)
@@ -57,5 +57,5 @@ if __name__ == '__main__':
     # theday = today()
     # print('Calculating user position...')
     # daily_user_position(theday)
-    date = '2019-04-12'
+    date = today()
     multi_main_position(date)

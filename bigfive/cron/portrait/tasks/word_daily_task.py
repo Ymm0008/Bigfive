@@ -10,7 +10,7 @@ from user.user_text_analyze import cal_user_text_analyze
 
 def daily_user_text(date):   #凌晨计算昨天的文本信息
     date = ts2date(int(date2ts(date))-86400)
-    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 1000)
     while True:
         try:
             es_result = next(iter_result)
@@ -25,8 +25,8 @@ def daily_user_text(date):   #凌晨计算昨天的文本信息
 
 
 if __name__ == '__main__':
-    for date in get_datelist_v2('2019-04-01','2019-04-10'):
-        daily_user_text(date)
-    # theday = today()
-    # print('Calculating daily_user_text...')
-    # daily_user_text(theday)
+    # for date in get_datelist_v2('2019-04-02','2019-04-11'):
+    #     daily_user_text(date)
+    theday = today()
+    print('Calculating daily_user_text...')
+    daily_user_text(theday)

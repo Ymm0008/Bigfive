@@ -12,7 +12,7 @@ from user.user_topic import get_user_topic
 def weekly_user_topic(date):
     date = ts2date(int(date2ts(date)) - DAY)
     print(date)
-    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 1000)
     iter_num = 0
     while True:
         try:

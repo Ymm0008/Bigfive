@@ -272,8 +272,7 @@ def user_add_one():
 
 @mod.route('/user_add_list', methods=['POST'])
 def user_add_list():
-    parameters = request.form.to_dict()
-    task_list = json.loads(parameters.get('list', "[]"))
+    task_list = request.json.get('list')
     result = user_add_list_task(task_list)
     return jsonify(result)
 

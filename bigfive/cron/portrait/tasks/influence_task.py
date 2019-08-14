@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import sys
+import time
 sys.path.append('../../../')
 sys.path.append('../../')
 sys.path.append('../')
@@ -81,6 +82,63 @@ def daily_user_influence_only(date):
             weibo_data_dict = get_weibo_data_dict(uid, date,date)
             cal_user_influence(uid,weibo_data_dict)
 
+def daily_push(date):
+    iter_ranking_result = get_user_generator("user_information",{"query":{"term":{"progress":2}}}, 1000)
+    # iter_ranking_result = get_user_generator("user_information", {"query": {"terms": {"uid":['1908758204','1630855457','1155439107','1684190853','2649521297','1232204102','3899867171','6440326941']}}}, 1000)
+    while True:
+        try:
+            ranking_result = next(iter_ranking_result)
+        except:
+            break
+        uid_ranking_list = []
+        username_ranking_list = []
+        push_status_list = []
+        for k, v in enumerate(ranking_result):
+            uid_ranking_list.append(str(ranking_result[k]["_source"]["uid"]))
+            try:
+                username_ranking_list.append(ranking_result[k]["_source"]["username"])
+            except:
+                username_ranking_list.append("")
+            try:
+                push_status_list.append(ranking_result[k]["_source"]["push_status"])
+            except:
+                push_status_list.append(0)
+        user_ranking(uid_ranking_list, push_status_list, username_ranking_list, date)
+
+# def daily_user_influence_only(date):
+#     date = ts2date(int(date2ts(date)) - DAY)
+#     # print(date)
+#     # iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1)
+#     # iter_num = 0
+#     # while True:
+#     #     try:
+#     #         es_result = next(iter_result)
+#     #         iter_num += 1
+#     #         print(iter_num)
+#     #         if iter_num <= 74:
+#     #             continue
+#     #     except:
+#     #         break
+#     #     uid_list = []
+#     #     username_list = []
+#     #     for k,v in enumerate(es_result):
+#     #         uid_list.append(es_result[k]["_source"]["uid"])
+#     #         try:
+#     #             username_list.append(es_result[k]["_source"]["username"])
+#     #         except:
+#     #             username_list.append("")
+#     #     for uid in uid_list:
+#     #         print(uid)
+#     #         weibo_data_dict = get_weibo_data_dict(uid, date,date)
+#     #         cal_user_influence(uid,weibo_data_dict)
+#     weibo_data_dict = get_weibo_data_dict(7079198950, date, date)
+#     print(weibo_data_dict)
+#     cal_user_influence(7079198950,weibo_data_dict)
+
+def daily_user(uid,start_date,end_date):
+    weibo_data_dict = get_weibo_data_dict(uid, start_date,end_date)
+    cal_user_influence(uid,weibo_data_dict)
+
 def multi_daily_user_influence(date):    #从Redis取出任务逐个计算
     while True:
         uid = redis_r.rpop('influence_task_%s' % date)
@@ -95,7 +153,7 @@ def multi_main_influence(date):
     #任务推入redis
     date = ts2date(int(date2ts(date)) - DAY)   #注意这里的取昨天的操作，算历史别算错了
     redis_r.delete('influence_task_%s' % date)
-    user_generator = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 100000)
+    user_generator = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 100000)
     for res in user_generator:
         userlist = [i['_source']['uid'] for i in res]
         redis_r.lpush('influence_task_%s' % date, *userlist)
@@ -148,12 +206,52 @@ def multi_test():
     p.join()
 
 if __name__ == '__main__':
-    # for date in get_datelist_v2('2019-03-29','2019-03-29'):
+    date_riqi = ts2date(time.time())
+    for date in get_datelist_v2(date_riqi,date_riqi):
+        daily_user_influence_only(date)
+        normalize_influence_index(date, date, 1)
+        daily_push(date)
+    # daily_push('2019-07-23')
+    # for date in get_datelist_v2('2019-07-23','2019-07-23'):
+    #     normalize_influence_index(date, date, 1)
+    # for date in get_datelist_v2("2019-04-19", "2019-04-19"):
     #     daily_user_influence_only(date)
     # theday = today()
     # print('Calculating user influence...')
     # daily_user_influence(theday)
     # multi_main('2019-03-30')
     # multi_test()
-    date = '2019-03-31'
-    multi_main_influence(date)
+    # date = '2019-03-31'
+
+
+    # for date in get_datelist_v2('2019-04-02','2019-04-08'):
+    #     multi_main_influence(date)
+    #     normalize_influence_index(date,date, 1)
+
+    # normalize_influence_index('2019-03-31','2019-03-31' , 1)
+
+    # uid = '1878219871'
+    # start_date = '2019-03-31'
+    # end_date = '2019-04-14'
+    # daily_user(uid, start_date, end_date)
+
+    # iter_ranking_result = get_user_generator("user_information",{"query":{"match_all":{}}}, 1000)
+    # while True:
+    #     try:
+    #         ranking_result = next(iter_ranking_result)
+    #     except:
+    #         break
+    #     uid_ranking_list = []
+    #     username_ranking_list = []
+    #     push_status_list = []
+    #     for k, v in enumerate(ranking_result):
+    #         uid_ranking_list.append(ranking_result[k]["_source"]["uid"])
+    #         try:
+    #             username_ranking_list.append(ranking_result[k]["_source"]["username"])
+    #         except:
+    #             username_ranking_list.append("")
+    #         push_status_list.append(ranking_result[k]["_source"]["push_status"])
+    #     user_ranking(uid_ranking_list, push_status_list, username_ranking_list, date)
+
+
+

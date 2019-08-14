@@ -13,7 +13,7 @@ from user.user_text_analyze import get_word_analysis
 def weekly_user_text_analyze(date):
     date = ts2date(int(date2ts(date)) - DAY)
     print(date)
-    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
+    iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 1000)
     while True:
         try:
             es_result = next(iter_result)
@@ -40,4 +40,4 @@ if __name__ == '__main__':
         pass
 
     # theday = '2019-04-10'
-    # weekly_user_text_analyze(theday)))
+    # weekly_user_text_analyze(theday)

@@ -305,14 +305,15 @@ def run_cal(today,lte_time):   #算过去五分钟的微博
                             }
                         }}]
                     }},
-                "size":10000   #因为速度原因只能先计算一万
+                "size":5000   #因为速度原因只能先计算五千
             }
     result_weibo = es_weibo.search(index=es_index, doc_type="text", body=query_body)["hits"]["hits"]
     print(len(result_weibo))
+    es.index(index="flow_timestamp", doc_type="text", body={"date": today, "timestamp": lte_time + 300})
     if len(result_weibo) != 0:
             #统计用户每条微博的转发关系 为了影响力
-        es.index(index="flow_timestamp", doc_type="text",body = {"date":today,"timestamp":lte_time})
-        for i ,weiboinfo in enumerate(result_weibo):
+        for index ,weiboinfo in enumerate(result_weibo):
+            print(5000 - index)
             cal_user_weibo_relation_info(weiboinfo["_source"])#统计用户每条微博的转发关系
 
 
@@ -373,21 +374,25 @@ def get_infludece_index():
             lte_time = es_result[0]["max_index"]["value"]
         else:
             lte_time = date2ts(today)
-
-        if lte_time > date2ts(today):   #如果在五分钟内算完了五分钟的数据则等待30秒直到到了下个五分钟
+        print(ts2datetime(lte_time))
+        if lte_time > int(time.time()):   #如果在五分钟内算完了五分钟的数据则等待30秒直到到了下个五分钟
             time.sleep(30)
         else:
             run_cal(today,lte_time)
             break
 
 if __name__ == '__main__':
-    # get_infludece_index()
+    get_infludece_index()
     # for today in get_datelist_v2("2019-03-30","2019-04-10"):
     #     timestamp = date2ts(today)
     #     for i in range(4, 288):
     #         print(i)
     #         run_cal(today, timestamp + 300 * i)
 
-    for date in get_datelist_v2("2019-03-30","2019-04-10"):
-        for i in range(int(86400/600)):
-            es.index(index='flow_timestamp',doc_type='text',body={"date":date,"timestamp":date2ts(date) + 600*i})
+    # for date in get_datelist_v2("2019-03-30","2019-04-10"):
+    #     for i in range(int(86400/600)):
+    #         es.index(index='flow_timestamp',doc_type='text',body={"date":date,"timestamp":date2ts(date) + 600*i})
+    # uid_list = ['1878219871']
+    # start_date = '2019-04-07'
+    # end_date = '2019-04-14'
+    # run_cal_user(uid_list, start_date, end_date)
