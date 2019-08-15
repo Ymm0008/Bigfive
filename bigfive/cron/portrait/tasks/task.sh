@@ -13,7 +13,7 @@ while ((1)); do
         python influence_task.py >> log/influence_task.log &
         python word_daily_task.py >> log/word_daily_task.log &
 
-        python topic_task.py >> log/topic_task.py.log &
+        python topic_task.py >> log/topic_task.log &
         python domain_task.py >> log/domain_task.log &
         python political_task.py >> log/political_task.log &
         python word_analyze_task.py >> log/word_analyze_task.log &

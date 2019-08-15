@@ -33,16 +33,16 @@ def weekly_user_domain(date):
 
 
 if __name__ == '__main__':
-    for date in get_datelist_v2('2019-04-10','2019-04-10'):
-        weekly_user_domain(date)
-    # weekday = datetime.datetime.now().weekday()
-    # theday = today()
-    # if weekday == 2:
-    #     print("Calculating user domain...")
-    #     weekly_user_domain(theday)
-    # else:
-    #     print("not reach calculating user doamin time")
-    #     pass
+    # for date in get_datelist_v2('2019-04-10','2019-04-10'):
+    #     weekly_user_domain(date)
+    weekday = datetime.datetime.now().weekday()
+    theday = today()
+    if weekday == 2:
+        print("Calculating user domain...")
+        weekly_user_domain(theday)
+    else:
+        print("not reach calculating user doamin time")
+        pass
 
 
     # theday = today()

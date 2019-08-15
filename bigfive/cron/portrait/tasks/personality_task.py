@@ -33,13 +33,13 @@ def monthly_user_personality(date):
 
 
 if __name__ == '__main__':
-    date = '2019-04-11'
-    monthly_user_personality(date)
-    # theday = today()
-    # date = time.strftime('%d', time.localtime(time.time()))
-    # if date == "01":
-    #     print("Calculating user personality...")
-    #     monthly_user_personality(theday)
-    # else:
-    #     print("not reach calculating user personality time")
-    #     pass
+    # date = '2019-04-11'
+    # monthly_user_personality(date)
+    theday = today()
+    date = time.strftime('%d', time.localtime(time.time()))
+    if date == "01":
+        print("Calculating user personality...")
+        monthly_user_personality(theday)
+    else:
+        print("not reach calculating user personality time")
+        pass

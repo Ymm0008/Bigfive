@@ -208,7 +208,7 @@ def multi_test():
 if __name__ == '__main__':
     date_riqi = ts2date(time.time())
     for date in get_datelist_v2(date_riqi,date_riqi):
-        daily_user_influence_only(date)
+        multi_main_influence(date)
         normalize_influence_index(date, date, 1)
         daily_push(date)
     # daily_push('2019-07-23')

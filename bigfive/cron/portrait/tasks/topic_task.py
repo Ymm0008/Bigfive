@@ -32,13 +32,13 @@ def weekly_user_topic(date):
 
 
 if __name__ == '__main__':
-    for date in get_datelist_v2('2019-04-10','2019-04-10'):
-        weekly_user_topic(date)
-    # weekday = datetime.datetime.now().weekday()
-    # theday = today()
-    # if weekday== 1:
-    #     print("Calculating user topic...")
-    #     weekly_user_topic(theday)
-    # else:
-    #     print("not reach calculating user topic time")
-    #     pass
+    # for date in get_datelist_v2('2019-04-10','2019-04-10'):
+    #     weekly_user_topic(date)
+    weekday = datetime.datetime.now().weekday()
+    theday = today()
+    if weekday== 1:
+        print("Calculating user topic...")
+        weekly_user_topic(theday)
+    else:
+        print("not reach calculating user topic time")
+        pass
