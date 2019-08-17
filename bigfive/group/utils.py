@@ -360,7 +360,10 @@ def get_group_basic_info(gid):
     nervousness_high_count = 0
     user_list = result['userlist']
     for user_id in user_list:
-        user_ranking_dict = es.get(index='user_ranking', id=user_id, doc_type='text')['_source']
+        try:
+            user_ranking_dict = es.get(index='user_ranking', id=user_id, doc_type='text')['_source']
+        except:
+            continue
         if user_ranking_dict['machiavellianism_label'] == 0:
             machiavellianism_low_count += 1
         if user_ranking_dict['machiavellianism_label'] == 2:
@@ -419,7 +422,7 @@ def modify_group_remark(group_id, remark):
 
 def group_preference(group_id):
 
-    query = {"query":{"bool":{"must":[{"term":{"group_id":group_id}}]}},"from":0,"size":1,"sort":[{"date": {"order": "desc"}}],"aggs":{}}
+    query = {"query":{"bool":{"must":[{"term":{"group_id":group_id}}]}},"from":0,"size":1,"sort":[],"aggs":{}}
     hits = es.search(index='group_domain_topic',doc_type='text',body=query)['hits']['hits']
     sta_hits = es.search(index='group_text_analysis_sta', doc_type='text', body=query)['hits']['hits']
 
@@ -443,6 +446,7 @@ def group_preference(group_id):
 
     result = {'domain_static': domain_static, 'topic_result': topic_static,
               'keywords': keywords, 'hastags': hastags, 'sensitive_words': sensitive_words}
+
     return result
 
 
@@ -618,7 +622,7 @@ def group_social_contact(group_id, map_type):
                             {
                                 "range": {
                                     "date": {
-                                        "gte": THREE_MONTH_AGO,
+                                        "gte": ts2date(date2ts(group_create_date) - 90 * 3600 * 24),
                                         "lte": group_create_date
                                     }
                                 }
@@ -628,7 +632,7 @@ def group_social_contact(group_id, map_type):
         },
         "size": 10000,
     }
-    print(query_body)
+    # print(query_body)
     r = es.search(index="user_social_contact", doc_type="text",
                   body=query_body)["hits"]["hits"]
     node = []

@@ -102,37 +102,37 @@ if __name__ == '__main__':
     end_date = today()
     start_date = ts2date(date2ts(end_date) - 15 * DAY)
     # user_main(['1908758204',"1630855457","1155439107","1684190853","2649521297","1232204102","3899867171","6440326941",],start_date, end_date)
-    query_body = {
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "term": {
-                "progress": "2"
-              }
-            }
-          ],
-          "must_not": [],
-          "should": []
-        }
-      },
-      "from": 0,
-      "size": 100000,
-      "sort": [{"uid":{"order":"asc"}}],
-      "aggs": {}
-    }
-    users = es.search(index=USER_INFORMATION, doc_type='text', body=query_body)['hits']['hits']
-    # for index, user in enumerate(users):
-    #     if user['_source']['uid'] == '1298674852':
-    #         print(index)
-    #         break
-    with open('error.txt','w') as f:
-        for user in users:
-            try:
-                user_main([user['_source']['uid']], start_date, end_date)
-            except:
-                print('error:%s' % user['_source']['uid'])
-                f.write(user['_source']['uid'] + '\n')
+    # query_body = {
+    #   "query": {
+    #     "bool": {
+    #       "must": [
+    #         {
+    #           "term": {
+    #             "progress": "2"
+    #           }
+    #         }
+    #       ],
+    #       "must_not": [],
+    #       "should": []
+    #     }
+    #   },
+    #   "from": 0,
+    #   "size": 100000,
+    #   "sort": [{"uid":{"order":"asc"}}],
+    #   "aggs": {}
+    # }
+    # users = es.search(index=USER_INFORMATION, doc_type='text', body=query_body)['hits']['hits']
+    # # for index, user in enumerate(users):
+    # #     if user['_source']['uid'] == '1298674852':
+    # #         print(index)
+    # #         break
+    # with open('error.txt','w') as f:
+    #     for user in users:
+    #         try:
+    #             user_main([user['_source']['uid']], start_date, end_date)
+    #         except:
+    #             print('error:%s' % user['_source']['uid'])
+    #             f.write(user['_source']['uid'] + '\n')
 
 
     # iter_result = get_user_generator("user_information", {"query":{"bool":{"must":[{"match_all":{}}]}}}, 1000)
@@ -173,3 +173,31 @@ if __name__ == '__main__':
     #     l = es.count(index='user_personality',doc_type='text',body=query_body)
     #     if l['count'] == 0:
     #         print(hit['_source']['uid'])
+
+    query_body = {
+        'query':{
+            'match_all':{}
+        },
+        'size':100000
+    }
+    users_ranking = es.search(index='user_ranking', doc_type='text', body=query_body)['hits']['hits']
+    query_body = {
+        'query':{
+            'match_all':{}
+        },
+        'size':100000
+    }
+    users_information = es.search(index='user_information', doc_type='text', body=query_body)['hits']['hits']
+    users_ra = set([i['_source']['uid'] for i in users_ranking])
+    cal_list = []
+    for index, user in enumerate(users_information):
+        print(index)
+        uid = user['_source']['uid']
+        if uid not in users_ra:
+            cal_list.append(uid)
+        if len(cal_list) == 50:
+            print('start calculating')
+            print(cal_list)
+            cal_user_personality(cal_list, start_date, end_date)
+            cal_list = []
+# cal_user_personality(['3739754765'], start_date, end_date))

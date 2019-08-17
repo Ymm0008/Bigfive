@@ -18,8 +18,6 @@ def monthly_user_personality(date):
             es_result = next(iter_result)
             iter_num += 1
             print(iter_num)
-            if iter_num <= 222:
-                continue
         except:
             break
         uid_list = []

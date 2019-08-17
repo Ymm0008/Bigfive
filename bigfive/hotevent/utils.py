@@ -455,7 +455,7 @@ def get_network(event_id):
                 nodedic[item['target']] += 1
             else:
                 nodedic[item['target']] = 1
-
+                
             if a not in node:
                 node.append(a)
             if b not in node:
@@ -464,7 +464,7 @@ def get_network(event_id):
     result['transmit_net'] = transmit_net
 
     nodedic_sorted = sorted(nodedic.items(), key=lambda x:x[1], reverse=True)
-    important_users_list = [i[0] for i in nodedic_sorted[:5]]
+    important_users_list = [i[0] for i in nodedic_sorted]
     query_body = {
         "query": {
             "filtered": {
@@ -479,14 +479,16 @@ def get_network(event_id):
                         ]}
                 }}
         },
-        "size": 5,
+        "size": 10000,
     }
 
     user_item = es.search(index='user_information', doc_type='text', body=query_body)['hits']['hits']
     user_item_dic = {i['_source']['uid']:i['_source'] for i in user_item}
-
-    result['important_users_list'] += [user_item_dic[uid] for uid in important_users_list]
-
+    for uid in important_users_list:
+        if uid in user_item_dic:
+            result['important_users_list'].append(user_item_dic[uid])
+        if len(result['important_users_list'])>=5:
+            break
     return result
 
 

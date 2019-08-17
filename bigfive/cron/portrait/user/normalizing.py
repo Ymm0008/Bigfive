@@ -102,7 +102,7 @@ def normalize_influence_index(start_date,end_date,day):
                     bulk(es, package)
                     package = []
 
-        bulk(es, package)
+            bulk(es, package)
 
 
      
@@ -111,6 +111,6 @@ def normalize_influence_index(start_date,end_date,day):
 if __name__ == '__main__':
     #uid_list = get_uidlist()
     #new_mapping(uid_list)
-    normalize_influence_index("2019-03-30","2019-03-30",1)
+    normalize_influence_index("2019-03-29","2019-03-29",1)
     
     

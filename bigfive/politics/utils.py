@@ -101,9 +101,9 @@ def get_politics_statistics(politics_id):
     buckets = r['aggregations']['statistics']['buckets']
     result = {'total':0,"negative": 0,"negative_pro": '0%',"positive": 0,"positive_pro": '0%'}
     for bucket in buckets:
-        if bucket['key'] == 1:
+        if int(bucket['key']) == 1:
             result['positive'] = bucket['doc_count']
-        elif bucket['key']>1:
+        elif int(bucket['key'])>1:
             result['negative'] += bucket['doc_count']
     result['total'] = r['hits']['total']
     result['negative_pro'] = "%d%%" % (result['negative']/result['total'] * 100)

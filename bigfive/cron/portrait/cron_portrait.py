@@ -63,23 +63,46 @@ def user_ranking(uid_list,push_status_list,username_list,date):
 
         #黑暗+大五人格计算值,只有未推入ranking表的时候才查询推入
         if push_status == 0:
-            machiavellianism_index = personality_dic[uid]['machiavellianism_index']
-            narcissism_index = personality_dic[uid]['narcissism_index']
-            psychopathy_index = personality_dic[uid]['psychopathy_index']
-            extroversion_index = personality_dic[uid]['extroversion_index']
-            nervousness_index = personality_dic[uid]['nervousness_index']
-            openn_index = personality_dic[uid]['openn_index']
-            agreeableness_index = personality_dic[uid]['agreeableness_index']
-            conscientiousness_index = personality_dic[uid]['conscientiousness_index']
+            if uid in personality_dic:
+                machiavellianism_index = personality_dic[uid]['machiavellianism_index']
+                narcissism_index = personality_dic[uid]['narcissism_index']
+                psychopathy_index = personality_dic[uid]['psychopathy_index']
+                extroversion_index = personality_dic[uid]['extroversion_index']
+                nervousness_index = personality_dic[uid]['nervousness_index']
+                openn_index = personality_dic[uid]['openn_index']
+                agreeableness_index = personality_dic[uid]['agreeableness_index']
+                conscientiousness_index = personality_dic[uid]['conscientiousness_index']
 
-            machiavellianism_label = personality_dic[uid]['machiavellianism_label']
-            narcissism_label = personality_dic[uid]['narcissism_label']
-            psychopathy_label = personality_dic[uid]['psychopathy_label']
-            extroversion_label = personality_dic[uid]['extroversion_label']
-            nervousness_label = personality_dic[uid]['nervousness_label']
-            openn_label = personality_dic[uid]['openn_label']
-            agreeableness_label = personality_dic[uid]['agreeableness_label']
-            conscientiousness_label = personality_dic[uid]['conscientiousness_label']
+                machiavellianism_label = personality_dic[uid]['machiavellianism_label']
+                narcissism_label = personality_dic[uid]['narcissism_label']
+                psychopathy_label = personality_dic[uid]['psychopathy_label']
+                extroversion_label = personality_dic[uid]['extroversion_label']
+                nervousness_label = personality_dic[uid]['nervousness_label']
+                openn_label = personality_dic[uid]['openn_label']
+                agreeableness_label = personality_dic[uid]['agreeableness_label']
+                conscientiousness_label = personality_dic[uid]['conscientiousness_label']
+            else:
+                uid_data = es.search(index=USER_PERSONALITY, doc_type='text', body={'query':{'term':{'uid':uid}},'sort':{'timestamp':{"order":"desc"}},'size':1})['hits']['hits']
+                if len(uid_data):
+                    machiavellianism_index = uid_data[0]['_source']['machiavellianism_index']
+                    narcissism_index = uid_data[0]['_source']['narcissism_index']
+                    psychopathy_index = uid_data[0]['_source']['psychopathy_index']
+                    extroversion_index = uid_data[0]['_source']['extroversion_index']
+                    nervousness_index = uid_data[0]['_source']['nervousness_index']
+                    openn_index = uid_data[0]['_source']['openn_index']
+                    agreeableness_index = uid_data[0]['_source']['agreeableness_index']
+                    conscientiousness_index = uid_data[0]['_source']['conscientiousness_index']
+
+                    machiavellianism_label = uid_data[0]['_source']['machiavellianism_label']
+                    narcissism_label = uid_data[0]['_source']['narcissism_label']
+                    psychopathy_label = uid_data[0]['_source']['psychopathy_label']
+                    extroversion_label = uid_data[0]['_source']['extroversion_label']
+                    nervousness_label = uid_data[0]['_source']['nervousness_label']
+                    openn_label = uid_data[0]['_source']['openn_label']
+                    agreeableness_label = uid_data[0]['_source']['agreeableness_label']
+                    conscientiousness_label = uid_data[0]['_source']['conscientiousness_label']
+                else:
+                    continue
 
             dic_personality = {
                 'machiavellianism_index':int(machiavellianism_index * 20),
@@ -126,7 +149,10 @@ def user_ranking(uid_list,push_status_list,username_list,date):
             es.index(index=USER_RANKING,doc_type='text',body=dic,id=uid)
             es.update(index=USER_INFORMATION,doc_type='text',body={'doc':{'push_status':1}},id=uid)
         else:   #如果已推入就只更新影响力
-            es.update(index=USER_RANKING,doc_type='text',body={'doc':dic},id=uid)
+            try:
+                es.update(index=USER_RANKING,doc_type='text',body={'doc':dic},id=uid)
+            except:
+                pass
 
 #通过调用模型中的预测函数获取当天的模型预测情况并存入数据库，可指定时间窗口
 def cal_user_personality(uid_list, start_date, end_date):

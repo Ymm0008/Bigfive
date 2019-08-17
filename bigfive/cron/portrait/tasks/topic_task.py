@@ -19,8 +19,6 @@ def weekly_user_topic(date):
             es_result = next(iter_result)
             iter_num += 1
             print(iter_num)
-            if iter_num <= 130:
-                continue
         except:
             break
         uid_list = []
@@ -42,3 +40,4 @@ if __name__ == '__main__':
     else:
         print("not reach calculating user topic time")
         pass
+    # weekly_user_topic(theday)
