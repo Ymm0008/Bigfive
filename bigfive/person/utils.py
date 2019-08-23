@@ -8,9 +8,10 @@ import xlsxwriter
 
 from elasticsearch.helpers import scan
 
-from bigfive.config import es, labels_dict, progress_dict, index_label_dict, political_bias_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO, USER_INFORMATION
+from bigfive.config import es, labels_dict, progress_dict, index_label_dict, political_bias_dict, topic_dict, MAX_VALUE, USER_RANKING, TODAY, A_WEEK_AGO, THREE_MONTH_AGO, USER_INFORMATION,USER_ACTIVITY,USER_DOMAIN_TOPIC,USER_EMOTION,USER_INFLUENCE,USER_PERSONALITY,USER_SOCIAL_CONTACT,USER_WEIBO_TYPE,USER_TEXT_ANALYSIS_STA
 from bigfive.cache import cache
 from bigfive.time_utils import yesterday, datetime2ts, ts2datetime, date2ts, ts2date
+from bigfive.person.excel_headers import EXCEL_HEADERS
 
 
 def judge_uid_or_nickname(keyword):
@@ -1293,3 +1294,147 @@ def get_user_excel_info(uidlist, filename):
     except Exception as e:
         print(e)
         return {"status":0}
+
+
+def create_other_data_excel(uidlist,filename,start_date,end_date):
+    filename = 'bigfive/' + filename
+    query_body = {"query":{"bool":{"must":[],"must_not":[],"should":[{"terms":{"uid":uidlist}},{"terms":{"source":uidlist}},{"terms":{"target":uidlist}}],"minimum_should_match": 1}},"from":0,"size":40000,"sort":[],"aggs":{}}
+    # print(query_body)
+    """后续添加时间段,需要根据不同表修改字段,暂时放在这
+    if start_date and end_date:
+        start_ts = date2ts(start_date)
+        end_ts = date2ts(end_date)
+        query_body['query']['bool']['must'].append({"range":{"timestamp":{"gte":start_ts,"lte":end_ts}}})
+    """
+    index_list = [USER_ACTIVITY,USER_DOMAIN_TOPIC,USER_EMOTION,USER_INFLUENCE,USER_SOCIAL_CONTACT,USER_TEXT_ANALYSIS_STA,USER_WEIBO_TYPE]
+    # print(index_list)
+    hits = es.search(index=index_list,body=query_body)['hits']['hits']
+    # 创建文件
+    workbook = xlsxwriter.Workbook(filename)
+
+    sheet_row_record = {}
+    worksheet_list = {}
+
+    t_dic = {1:'原创',2:'评论', 3:'转发'}
+
+    for hit in hits:
+        index = hit['_index']
+        source = hit['_source']
+        # 为没有日期字段的数据根据时间戳添加日期字段
+        if 'date' not in source:
+            source['date'] = ts2date(source['timestamp'])
+        # 从统一的字典中取出sheet名称和表头
+        sheet_name = EXCEL_HEADERS[index]['sheetname']
+        headers = EXCEL_HEADERS[index]['headers']
+        header_value_map = EXCEL_HEADERS[index]['rev_map']
+        if sheet_name not in worksheet_list:
+            # 创建sheet
+            worksheet = workbook.add_worksheet(sheet_name)
+            worksheet.set_column("A:ZZ",width=14)
+            # 写入表头
+            worksheet.write_row('A1', headers)
+            # 此时该sheet的已写入行数为1
+            sheet_row_record[sheet_name] = 2
+            # 用于记录所有sheet
+            worksheet_list[sheet_name] = worksheet
+        else:
+            worksheet = worksheet_list[sheet_name]
+        values = []
+        for header in headers:
+            en_header = header_value_map[header]
+            v = source[en_header]
+            # 偏好特征表中的领域需要转为对应的中文
+            if index == USER_DOMAIN_TOPIC and v in labels_dict:
+                v = labels_dict[v]
+            if index == USER_DOMAIN_TOPIC and en_header == 'main_topic':
+                a = v.replace('topic_','')
+                v = topic_dict[a]
+            if index == USER_SOCIAL_CONTACT and en_header == 'message_type':
+                v = t_dic[v]
+            # 有些字典/列表转为字符串导出
+            if index == USER_TEXT_ANALYSIS_STA and (isinstance(v,list) or isinstance(v,dict)):
+                v = json.dumps(v,ensure_ascii=False)
+            values.append(v)
+        worksheet.write_row('A%d' % sheet_row_record[sheet_name], values)
+        sheet_row_record[sheet_name] += 1
+    # print(sheet_row_record)
+
+    datadic = {}
+    headings = []
+    headings_cn = []
+    # 基本信息
+    data = es.mget(index = USER_INFORMATION,doc_type = 'text', body = {'ids': uidlist})['docs']
+    
+    for index, item in enumerate(data):
+        if item['found']:
+            uid = item['_source']['uid']
+            username = item['_source']['username']
+            gender = '男' if item['_source']['gender'] else '女'
+            description = item['_source']['description']
+            user_location = item['_source']['user_location']
+            friends_num = item['_source']['friends_num']
+            create_at = ts2datetime(item['_source']['create_at'])
+            weibo_num = item['_source']['weibo_num']
+            user_birth = item['_source']['user_birth']
+            isreal = '是' if item['_source']['isreal'] else '否'
+            photo_url = item['_source']['photo_url']
+            fans_num = item['_source']['fans_num']
+            if 'political_bias' in item['_source']:
+                political_bias = political_bias_dict[item['_source']['political_bias']]
+            else:
+                political_bias = ''
+            if 'domain' in item['_source']:
+                domain = labels_dict[item['_source']['domain']]
+            else:
+                domain = ''
+            insert_time = ts2datetime(item['_source']['insert_time'])
+            progress = progress_dict[item['_source']['progress']]
+            datadic[uid] = [index+1, uid, username, gender, description, user_location, friends_num, create_at, weibo_num, user_birth, isreal, photo_url, fans_num, political_bias, domain, insert_time, progress]
+        else:
+            datadic[item['_id']] = [index+1, item['_id']]
+            datadic[item['_id']].extend(['未找到该用户基本信息，请检查输入是否正确'] * 15) 
+    # headings.extend(["uid", "username", "gender", "description", "user_location", "friends_num", "create_at", "weibo_num", "user_birth", "isreal", "photo_url", "fans_num", "political_bias", "domain", "insert_time", "progress"])
+    headings_cn.extend(["序号","用户ID","用户名","性别","用户简介","所在地","关注数","创建时间","微博数","出生日期","是否实名","头像链接","粉丝数","政治倾向","用户领域","入库时间","计算状态"])
+
+    # 人格指数
+    data = es.mget(index = USER_RANKING,doc_type = 'text', body = {'ids': uidlist})['docs']
+    for item in data:
+        if item['found']:
+            machiavellianism_index = item['_source']['machiavellianism_index']
+            narcissism_index = item['_source']['narcissism_index']
+            psychopathy_index = item['_source']['psychopathy_index']
+            extroversion_index = item['_source']['extroversion_index']
+            nervousness_index = item['_source']['nervousness_index']
+            openn_index = item['_source']['openn_index']
+            agreeableness_index = item['_source']['agreeableness_index']
+            conscientiousness_index = item['_source']['conscientiousness_index']
+            liveness_index = item['_source']['liveness_index']
+            importance_index = item['_source']['importance_index']
+            sensitive_index = item['_source']['sensitive_index']
+            influence_index = item['_source']['influence_index']
+            liveness_star = item['_source']['liveness_star']
+            importance_star = item['_source']['importance_star']
+            sensitive_star = item['_source']['sensitive_star']
+            influence_star = item['_source']['influence_star']
+            machiavellianism_label = index_label_dict[item['_source']['machiavellianism_label']]
+            narcissism_label = index_label_dict[item['_source']['narcissism_label']]
+            psychopathy_label = index_label_dict[item['_source']['psychopathy_label']]
+            extroversion_label = index_label_dict[item['_source']['extroversion_label']]
+            nervousness_label = index_label_dict[item['_source']['nervousness_label']]
+            openn_label = index_label_dict[item['_source']['openn_label']]
+            agreeableness_label = index_label_dict[item['_source']['agreeableness_label']]
+            conscientiousness_label = index_label_dict[item['_source']['conscientiousness_label']]
+            datadic[item['_source']['uid']].extend([machiavellianism_index, narcissism_index, psychopathy_index, extroversion_index, nervousness_index, openn_index, agreeableness_index, conscientiousness_index, liveness_index, importance_index, sensitive_index, influence_index, liveness_star, importance_star, sensitive_star, influence_star, machiavellianism_label, narcissism_label, psychopathy_label, extroversion_label, nervousness_label, openn_label, agreeableness_label, conscientiousness_label])
+        else:
+            datadic[item['_id']].extend(['未找到该用户人格信息，请检查输入是否正确或该用户是否已经计算'] * 24) 
+    # headings.extend(["machiavellianism_index", "narcissism_index", "psychopathy_index", "extroversion_index", "nervousness_index", "openn_index", "agreeableness_index", "conscientiousness_index", "liveness_index", "importance_index", "sensitive_index", "influence_index", "liveness_star", "importance_star", "sensitive_star", "influence_star", "machiavellianism_label", "narcissism_label", "psychopathy_label", "extroversion_label", "nervousness_label", "openn_label", "agreeableness_label", "conscientiousness_label"])
+    headings_cn.extend(["马基雅维里主义指数","自恋指数","精神病态指数","外倾性指数","神经质指数","开放性指数","宜人性指数","尽责性指数","活跃度","重要度","敏感度","影响力","活跃度星级","重要度星级","敏感度星级","影响力星级","马基雅维里主义标签","自恋标签","精神病态标签","外倾性标签","神经质标签","开放性标签","宜人性标签","尽责性标签"])
+
+    worksheet = workbook.add_worksheet('用户信息')
+    worksheet.write_row('A1', headings_cn)
+    num = 2
+    for uid in datadic:
+        worksheet.write_row('A%d' % num, datadic[uid])
+        num += 1
+
+    workbook.close()

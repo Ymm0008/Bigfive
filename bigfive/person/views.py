@@ -287,15 +287,33 @@ def user_task_delete():
     result = delete_user_task(uid)
     return jsonify(result)
 
+# @mod.route('/user_info_download', methods=['POST', 'GET'])
+# def user_info_download():
+#     uids = request.args.get('person_id')
+#     timenow = str(int(time.time()))
+#     filename = 'outfile/' + timenow + '.xlsx'
+#     uidlist = uids.split(',')
+#     get_user_excel_info(uidlist, filename)
+#     try:
+#         response = send_file(filename, as_attachment=True, attachment_filename="%s.xlsx" % timenow)
+#         ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+#         os.remove(ABS_PATH + '/../' + filename)
+#     except Exception as e:
+#         print(e)
+#         return json.dumps({"status":0})
+#     return response
+
 @mod.route('/user_info_download', methods=['POST', 'GET'])
 def user_info_download():
     uids = request.args.get('person_id')
-    timenow = ts2datetime(int(time.time()))
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    timenow = str(int(time.time()))
     filename = 'outfile/' + timenow + '.xlsx'
     uidlist = uids.split(',')
-    get_user_excel_info(uidlist, filename)
+    create_other_data_excel(uidlist,filename,start_date,end_date)
     try:
-        response = make_response(send_file(filename, as_attachment=True, attachment_filename="%s.xlsx" % timenow))
+        response = send_file(filename, as_attachment=True, attachment_filename="%s.xlsx" % timenow)
         ABS_PATH = os.path.abspath(os.path.dirname(__file__))
         os.remove(ABS_PATH + '/../' + filename)
     except Exception as e:
