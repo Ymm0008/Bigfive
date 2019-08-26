@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # for date in get_datelist_v2('2019-04-10','2019-04-10'):
     #     weekly_user_domain(date)
     weekday = datetime.datetime.now().weekday()
-    theday = today()
+    theday = ts2date(date2ts(today()) - 86400)   #因为domain和topic的逻辑是互相更新，所以周一算topic之后，周二算domain的时候算的是周一的domain，更新到周一里
     if weekday == 2:
         print("Calculating user domain...")
         weekly_user_domain(theday)

@@ -151,7 +151,7 @@ def multi_daily_user_influence(date):    #从Redis取出任务逐个计算
 
 def multi_main_influence(date):
     #任务推入redis
-    date = ts2date(int(date2ts(date)) - DAY)   #注意这里的取昨天的操作，算历史别算错了
+    date = ts2date(int(date2ts(date)))   #注意这里的取昨天的操作，算历史别算错了
     redis_r.delete('influence_task_%s' % date)
     user_generator = get_user_generator("user_information", {"query":{"bool":{"must":[{"term":{"progress":2}}]}}}, 100000)
     for res in user_generator:
@@ -206,7 +206,7 @@ def multi_test():
     p.join()
 
 if __name__ == '__main__':
-    date_riqi = ts2date(time.time())
+    date_riqi = ts2date(time.time() - 86400)
     for date in get_datelist_v2(date_riqi,date_riqi):
         multi_main_influence(date)
         normalize_influence_index(date, date, 1)

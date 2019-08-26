@@ -10,6 +10,7 @@ from global_utils import *
 
 from user.user_activity import get_user_weibo_type
 from user.cron_user import get_weibo_data_dict
+from user_fans_task import user_fans_update
 
 # def get_weibo_data_dict(uid, start_date,end_date):
 #     weibo_data_dict = {}
@@ -60,3 +61,4 @@ if __name__ == '__main__':
     theday = today()
     print('Calculating user activity...')
     daily_user_activity(theday)
+    print('Updating user fans...')    user_fans_update(theday))

@@ -75,13 +75,13 @@ def ip_rank(ip_list):
 
         es.index(index="user_activity",doc_type="text",
         body={
-        "timestamp": i["timestamp"],
-        "uid":i["uid"],
-        "ip":i["key"],
-        "geo":location
-        ,
-        "count":int(i["doc_count"])
-                },timeout=50)
+            "timestamp": i["timestamp"],
+            "uid":i["uid"],
+            "ip":i["key"],
+            "geo":location,
+            "count":int(i["doc_count"]),
+            "date":ts2date(i["timestamp"])
+        },timeout=50)
 
   
 def get_user_activity(uid, start_date,end_date):
@@ -100,7 +100,8 @@ def get_user_activity(uid, start_date,end_date):
                         "uid":uid,
                         "ip":"",
                         "geo":"",
-                        "count":0},timeout=50)
+                        "count":0,
+                        "date":day},timeout=50)
             else:
                 ip_rank(ip_list)
 
@@ -110,4 +111,3 @@ def get_user_activity(uid, start_date,end_date):
 
 if __name__ == '__main__':
     get_user_activity(uid, start_date,end_date)
-    
